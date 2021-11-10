@@ -53,7 +53,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     config = configparser.ConfigParser()
     config.read(args.conf)
-    port = config.getint("server", "port", fallback="8015")
+    port = config.getint("server", "port", fallback=8015)
+    host = config.get("server", "host", fallback="0.0.0.0")
     debug = config.getboolean("server", "debug", fallback=True)
 
-    app.run(port=port, debug=True)
+    app.run(host=host, port=port, debug=True)

@@ -13,4 +13,5 @@ services:
     network_mode: "host"
     volumes:
       - ./monitored_app/conf:/www/ppro/monitored_app/conf
+      - ./monitored_app/src:/www/ppro/monitored_app/src
 

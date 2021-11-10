@@ -39,6 +39,7 @@ def hello():
     return f"hello from {__name__}!"
 
 
+@app.route('/metrics')
 @app.route('/metrics/')
 def get_metrics():
     return Response(prometheus_client.generate_latest(),

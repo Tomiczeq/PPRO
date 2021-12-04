@@ -1,0 +1,9 @@
+:root {
+    --settings-nav-bg: #1f3d55;
+    --settings-nav-li: #33648d;
+    --settings-nav-li-hover: #4b97d4;
+    --settings-nav-li-selected: #4bd4a6;     
+
+    --settings-content-bg: #1f3d55;
+    --settings-content-li: #4f95ce;
+}

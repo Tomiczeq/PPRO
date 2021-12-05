@@ -1,0 +1,117 @@
+* { box-sizing: border-box; } 
+
+.dashboard_navbar {
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px;
+    background: var(--settings-nav-bg);
+    padding: 0 10px;
+    border-bottom: 1px solid;
+    color: var(--settings-nav-li)
+}
+
+.dashboard_profile {
+    color: var(--dashboard-profile);
+}
+
+.dashboard_profile .icon {
+}
+
+.dashboard_profile .icon:hover {
+    color: var(--dashboard-profile-fav-hover);
+}
+
+.dashboard_tools {
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard_tools .icon:hover {
+    color: var(--settings-nav-li-hover);
+}
+
+.dashboard_tools span {
+    margin: 0 4px;
+}
+
+.dashboard_tools div span {
+    /* display: flex; */
+    /* justify-content: center; */
+    margin: 0 2px;
+}
+
+.dashboard_tools div {
+    margin: 0 4px;
+    border: 1px solid;
+}
+
+.dashboard_views span{
+    margin: 0 2px;
+}
+
+.dashboard_views .icon {
+    cursor: pointer;
+}
+
+.dashboard_views .icon:hover {
+    color: var(--settings-nav-li-hover);
+}
+
+.selected_view {
+    color: var(--settings-nav-li-selected);
+}
+
+.dashboard_content {
+    position: relative;
+    background: var(--settings-content-bg);
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+}
+
+.dashboard_item {
+    margin: 5px;
+    background: var(--chart-bg);
+    width: max-content;
+    height: max-content;
+}
+
+.dashboard_item .chart_nav .chart_name {
+    color: var(--chart-name);
+}
+
+.dashboard_item .chart_nav .icon {
+    color: var(--chart-cfg);
+    cursor: pointer;
+}
+
+.dashboard_item .chart_nav .icon:hover {
+    color: var(--chart-cfg-hover);
+}
+
+.dashboard_item .chart_nav {
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard_item .chart_nav span {
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: 5px;
+}
+
+#chart1 .chart {
+    width: 300px;
+    height: 200px;
+}
+#chart2 .chart {
+    width: 300px;
+    height: 200px;
+}
+#chart3 .chart {
+    width: 300px;
+    height: 200px;
+}

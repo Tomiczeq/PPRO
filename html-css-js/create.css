@@ -1,0 +1,23 @@
+.create_dashboard_container {
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: var(--settings-content-bg);
+    color: var(--settings-nav-li);
+    justify-content: center;
+    align-items: center;
+}
+
+.create_dashboard_container input {
+    line-height: 20px;
+}
+
+.create_dashboard_container span {
+    margin-left: 10px;
+}
+
+.create_dashboard_container span:hover {
+    margin-left: 10px;
+    color: var(--settings-nav-li-hover);
+}

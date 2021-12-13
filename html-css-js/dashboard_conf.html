@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="dashboard_conf.css">
+    <link rel="stylesheet" href="colors.css">
+    <script src="https://kit.fontawesome.com/d8730202bf.js"></script>
+</head>
+<body>
+
+    <!-- container pro graf -->
+    <div class="dashboard_conf_chart">
+        <div class="chart_wrapper">
+            <span class="chart_name">ChartName</span>
+            <div class="chart"></div>
+        </div>
+    </div>
+
+    <div class="dashboard_conf_nav">
+        <ul>
+            <li id="dashconf_general_btn", class="dashconf_nav_li">general</li>
+            <li id="dashconf_query_btn", class="dashconf_nav_li">query</li>
+            <li id="dashconf_visualization_btn", class="dashconf_nav_li">Visualisation</li>
+            <li id="dashconf_axes_btn", class="dashconf_nav_li">axes</li>
+            <li id="dashconf_display_btn", class="dashconf_nav_li">display</li>
+        </ul>
+    </div>
+
+
+    <!-- Obsah jednotlivych nastaveni -->
+    <div class="dashboard_conf_content", id="dashconf_general_container">
+        <span>name</span>
+        <span>
+            <input id="dashboard_name" type="text">
+        </span>
+    </div>
+
+    <div class="dashboard_conf_content", id="dashconf_query_container">
+        <span>query</span>
+        <span>
+            <input id="dashboard_query" type="text">
+        </span>
+    </div>
+
+    <div class="dashboard_conf_content", id="dashconf_visualization_container">
+        Not implemented (visualisation)
+    </div>
+
+    <div class="dashboard_conf_content", id="dashconf_axes_container">
+        Not implemented (axes)
+    </div>
+
+    <div class="dashboard_conf_content", id="dashconf_display_container">
+        Not implemented (display)
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/packery@2/dist/packery.pkgd.js"></script>
+    <script src="https://unpkg.com/draggabilly@2/dist/draggabilly.pkgd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="dashboard_conf.js"></script>
+</body>
+</html>

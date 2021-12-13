@@ -40,6 +40,7 @@ move_btn.addEventListener('click', () => {
     })
 })
 
+// Prepinani mezi prohlizenim, posouvanim grafu
 var view_btns = document.querySelectorAll(".dashboard_views .icon")
 view_btns.forEach((view_btn) => {
     view_btn.addEventListener("click", () => {
@@ -52,6 +53,14 @@ view_btns.forEach((view_btn) => {
 })
 
 explore_btn.click();
+
+// Event listener pro zobrazeni nastaveni konkretniho grafu
+var chart_setting_btns = document.querySelectorAll(".chart_nav .icon")
+chart_setting_btns.forEach((setting_btn) => {
+    setting_btn.addEventListener("click", () => {
+        $(".main_container").load("dashboard_conf.html")
+    })
+})
 
 function delay(time) {
     return new Promise(resolve => setTimeout(resolve, time));

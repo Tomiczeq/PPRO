@@ -1,30 +1,21 @@
-import requests
 import argparse
 import configparser
 from flask import Flask
-from flask import render_template
-from flask import request
+
+from views.api import api
+from views.dashboards import dashboards
+from views.home import home
 
 
-parser = argparse.ArgumentParser(description='Sample app')
+parser = argparse.ArgumentParser(description="Sample app")
 parser.add_argument("--conf", action="store",
                     default="conf/server.conf")
+
+
 app = Flask(__name__)
-
-
-@app.route("/")
-def homepage():
-    return render_template("index.html")
-
-@app.route("/api/query", methods=["POST"])
-@app.route("/api/query/", methods=["POST"])
-def query():
-
-    url = prometheus_url + '/api/v1/query'
-    params = {"query": request.form['promql']}
-    response = requests.get(url, params=params)
-
-    return response.text
+app.register_blueprint(home)
+app.register_blueprint(api, url_prefix="/api")
+app.register_blueprint(dashboards, url_prefix="/dashboards")
 
 
 if __name__ == "__main__":

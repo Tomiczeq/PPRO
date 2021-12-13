@@ -1,0 +1,10 @@
+version: "3"
+services:
+
+  dashboard:
+    build:
+      context: .
+    network_mode: "host"
+    volumes:
+      - ./conf:/www/ppro/dashboard/conf
+      - ./src:/www/ppro/dashboard/src

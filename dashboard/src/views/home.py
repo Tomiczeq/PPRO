@@ -6,5 +6,11 @@ home = Blueprint('home', __name__,
 
 
 @home.route("/", methods=["GET"])
-def homepage():
+def home_page():
     return render_template("home.html")
+
+
+@home.route("/search", methods=["GET"])
+def search_page():
+    dashboards = ["sentinel" for i in range(100)]
+    return render_template("search.html", dashboards=dashboards)

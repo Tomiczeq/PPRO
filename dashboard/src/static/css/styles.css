@@ -1,0 +1,29 @@
+:root {
+    --nav-bg: #1f3d55;
+    --nav-fg: #33648d;
+    --nav-hover: #4b97d4;
+    --nav-selected: #4bd4a6;     
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    background: var(--nav-bg);
+}
+
+nav a {
+    margin: 5px 5px;
+}
+
+.nav_button {
+    color: var(--nav-fg);
+}
+
+.nav_button:hover {
+    color: var(--nav-hover);
+}
+
+.nav_button_selected {
+    color: var(--nav-selected);
+}

@@ -1,0 +1,17 @@
+{% extends 'navigation.html' %}
+
+{% block title %} Home {% endblock %}
+
+{% block content %}
+    <h1>Hello World!</h1>
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var selected_btn = document.getElementById("nav_home_btn");
+    selected_btn.classList.remove("nav_button");
+    selected_btn.classList.add("nav_button_selected");
+</script>
+
+{% endblock %}

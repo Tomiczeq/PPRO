@@ -19,7 +19,7 @@
             <ul>
                 {% for dashboard in dashboards %}
                     <li id="{{ dashboard.id }}">
-                        <a href="{{ url_for('dashboards.dashboard_page', dashboard_name=dashboard.name) }}">
+                        <a href="{{ url_for('dashboards.dashboard_page', name=dashboard.name) }}">
                             {{ dashboard.name }}
                         </a>
                     </li>

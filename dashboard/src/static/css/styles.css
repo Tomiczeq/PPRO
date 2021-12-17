@@ -15,6 +15,8 @@
     --search_border: var(--nav-border);
     --search_fg: var(--nav-fg);
     --search_hover: var(--nav-hover);
+
+    --dashboard_fg: var(--nav-fg);
 }
 
 * {
@@ -149,4 +151,24 @@ nav a {
 .create_wrapper span {
     display: none;
     color: var(--err);
+}
+
+/* DASHBOARD */
+
+.dashboard_navbar {
+    display: flex;
+    justify-content: space-between;
+    color: var(--dashboard_fg);
+    padding: 0px 10px;
+    border-bottom: 1px solid var(--nav-border);
+    z-index: 1;
+}
+
+.icon_btn {
+    color: var(--dashboard_fg);
+    cursor: pointer;
+}
+
+.icon_btn:hover {
+    color: var(--nav-hover);
 }

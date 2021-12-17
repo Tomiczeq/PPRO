@@ -8,6 +8,9 @@ services:
     volumes:
       - ./conf:/www/ppro/dashboard/conf
       - ./src:/www/ppro/dashboard/src
+      - ./scripts:/www/ppro/dashboard/scripts
+    entrypoint: scripts/entrypoint.sh
+    command: python3 /www/ppro/dashboard/src/server.py --conf=/www/ppro/dashboard/conf/server.conf
 
   mysql:
     image: mysql:5.7

@@ -2,6 +2,7 @@
 
 :root {
     --bg: white;
+    --err: rgb(255, 128, 128);
 
     --nav-bg: #1f3d55;
     --nav-fg: #33648d;
@@ -129,4 +130,23 @@ nav a {
 
 .search_content li a {
     color: inherit;
+}
+
+
+/* CREATE DASHBOARDS */
+
+.create_content {
+    display: flex;
+    justify-content: center;
+}
+
+.create_wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.create_wrapper span {
+    display: none;
+    color: var(--err);
 }

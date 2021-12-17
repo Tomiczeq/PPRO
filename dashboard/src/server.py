@@ -1,3 +1,4 @@
+import pymysql
 import argparse
 import configparser
 from flask import Flask
@@ -5,6 +6,8 @@ from flask import Flask
 from views.api import api
 from views.dashboards import dashboards
 from views.home import home
+from views.models import db
+from views.models import Dashboard  # TODO docasne
 
 
 parser = argparse.ArgumentParser(description="Sample app")
@@ -16,6 +19,7 @@ app = Flask(__name__)
 app.register_blueprint(home)
 app.register_blueprint(api, url_prefix="/api")
 app.register_blueprint(dashboards, url_prefix="/dashboards")
+db.init_app(app)
 
 
 if __name__ == "__main__":
@@ -23,6 +27,16 @@ if __name__ == "__main__":
 
     config = configparser.ConfigParser()
     config.read(args.conf)
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://@localhost/test"
+
+    with app.app_context():
+        db.create_all()
+        sentinel = Dashboard('sentinel')
+        nametag = Dashboard('nametag')
+        db.session.add(sentinel)
+        db.session.add(nametag)
+        db.session.commit()
 
     port = config.getint("server", "port", fallback=8080)
     host = config.get("server", "host", fallback="0.0.0.0")

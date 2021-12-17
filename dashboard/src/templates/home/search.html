@@ -18,9 +18,9 @@
         <div class="search_content">
             <ul>
                 {% for dashboard in dashboards %}
-                    <li id="{{ dashboard }}">
-                        <a href="{{ url_for('dashboards.dashboard_page', dashboard_name=dashboard) }}">
-                            {{ dashboard }}
+                    <li id="{{ dashboard.id }}">
+                        <a href="{{ url_for('dashboards.dashboard_page', dashboard_name=dashboard.name) }}">
+                            {{ dashboard.name }}
                         </a>
                     </li>
                 {% endfor %}
@@ -46,7 +46,7 @@
         var text = search_text.value.trim();
 
         li_items.forEach((li_item) => {
-            if (li_item.id.includes(text)) {
+            if (li_item.textContent.includes(text)) {
                 li_item.style.display = "flex";
             }
             else {

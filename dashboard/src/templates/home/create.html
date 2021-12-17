@@ -1,0 +1,28 @@
+{% extends 'navigation.html' %}
+
+{% block title %} Create {% endblock %}
+
+{% block content %}
+    <div class="create_content">
+        <div class="create_wrapper">
+            <span class="create_exists">already exists</span>
+            <form action="/create", method="POST">
+                <input type="text" id="name" name="name"><br>
+                <input type="submit" value="Create">
+            </form> 
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block scripts %}
+    <script>
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const exists = urlParams.get('alreadyExists')
+        if (exists == 1) {
+            var elem = document.querySelector(".create_exists");
+            elem.style.display = "block";
+        } 
+    </script>
+{% endblock %}

@@ -8,3 +8,10 @@ services:
     volumes:
       - ./conf:/www/ppro/dashboard/conf
       - ./src:/www/ppro/dashboard/src
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      - MYSQL_DATABASE=test  # TODO rename
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    network_mode: "host"

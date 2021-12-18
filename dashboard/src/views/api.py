@@ -15,9 +15,6 @@ api = Blueprint('api', __name__)
 def get_dashboard_charts():
     dashboard_id = request.args.get('dashboard_id')
 
-    current_app.logger.info("lalalal")
-    current_app.logger.info(f"id: {dashboard_id}")
-
     if not dashboard_id:
         return make_response("Not found\n", 404)
 

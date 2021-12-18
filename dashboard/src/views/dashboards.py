@@ -3,8 +3,7 @@ from flask import abort
 from flask import current_app
 from views.models import Dashboard
 
-dashboards = Blueprint('dashboards', __name__,
-                       template_folder="../templates/dashboards")
+dashboards = Blueprint('dashboards', __name__)
 
 
 @dashboards.route("/<name>", methods=["GET"])

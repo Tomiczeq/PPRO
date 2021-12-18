@@ -6,8 +6,7 @@ from flask import url_for
 from views.models import db
 from views.models import Dashboard
 
-home = Blueprint('home', __name__,
-                 template_folder="../templates/home")
+home = Blueprint('home', __name__)
 
 
 @home.route("/", methods=["GET"])

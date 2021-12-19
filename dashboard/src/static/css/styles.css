@@ -172,3 +172,74 @@ nav a {
 .icon_btn:hover {
     color: var(--nav-hover);
 }
+
+.chart {
+    background: rgba(255, 255, 255, 0.555);
+    margin: 1px;
+}
+
+/* CHART */
+
+.chart_wrapper {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.chart_name {
+    color: var(--nav-fg);
+}
+
+.chart_conf_nav {
+    display: flex;
+    position: relative;
+    color: var(--nav-fg);
+    background: var(--nav-bg);
+    align-items: flex-end;
+    justify-content: center;
+    width: 100%;
+    height: 80px;
+}
+
+.chart_conf_nav ul {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.chart_conf_nav ul li {
+    padding: 12px 25px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    transition: all 0.5s ease;
+    cursor: pointer;
+}
+
+
+.chartconf_nav_li {
+    color: var(--settings-nav-li)
+}
+
+.chartconf_nav_li:hover {
+    color: var(--nav-hover)
+}
+
+.chartconf_nav_li_selected {
+    color: var(--nav-selected)
+}
+
+.chart_conf_content {
+    display: none;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+}
+
+.options_wrapper {
+    display: flex;
+    flex-direction: column;
+
+}

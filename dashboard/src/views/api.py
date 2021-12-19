@@ -38,4 +38,36 @@ def create_new_chart():
     chart = Chart(name="New Chart", dashboard=dashboard)
     db.session.add(chart)
     db.session.commit()
-    return make_response("", 201)
+    return make_response(jsonify(chart.to_dict()), 201)
+
+
+@api.route("updateChart", methods=["POST"])
+def update_chart():
+    chart_id = request.form.get('id')
+    name = request.form.get("name")
+    width = request.form.get("width")
+    min_width = request.form.get("min_width")
+    max_width = request.form.get("max_width")
+    height = request.form.get("height")
+    min_height = request.form.get("min_height")
+    max_height = request.form.get("max_height")
+    prom_query = request.form.get("prom_query")
+
+    if not chart_id:
+        return make_response("Not found\n", 404)
+
+    chart = Chart.query.get(chart_id)
+
+    if not chart:
+        return make_response("Not found\n", 404)
+
+    chart.name = name
+    chart.width = width
+    chart.min_width = min_width
+    chart.max_width = max_width
+    chart.height = height
+    chart.min_height = min_height
+    chart.max_height = max_height
+    chart.prom_query = prom_query
+    db.session.commit()
+    return make_response("", 200)

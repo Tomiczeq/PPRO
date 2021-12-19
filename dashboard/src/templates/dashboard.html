@@ -3,6 +3,7 @@
 {% block title %} {{ dashboard.name }} {% endblock %}
 
 {% block content %}
+
     <div class="dashboard_navbar">
         <div class="dashboard_profile">
             <span>{{ dashboard.name }}</span>
@@ -14,7 +15,7 @@
             <span id="move_btn" class="icon_btn">
                 <i class="fas fa-expand-arrows-alt"></i>
             </span>
-            <span class="icon_btn" id="add_chart_btn">
+            <span class="icon_btn" id="add_row_btn">
                 <i class="fas fa-plus"></i>
             </span>
             <span class="icon_btn" id="save_dashboard_btn">
@@ -28,12 +29,89 @@
             </span>
         </div>
     </div>
+
+    <div class="rows_container">
+    </div>
+
+    <div class="charts_container">
+        <!-- {% for chart in charts %}
+            <div id="{{ chart.id }}" class="chart">
+                <div class="chart_nav">
+                    <span class="chart_name">{{ chart.name }}</span>
+                    <a class="icon_btn", href="{{ url_for('dashboards.chart_page', chart_id=chart.id) }}">
+                        <i class="fas fa-cog"></i>
+                    </a>
+                </div>
+            </div>
+        {% endfor %} -->
+    </div>
+
 {% endblock %}
 
 
 {% block scripts %}
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
     <script>
         const dashboard_id = "{{ dashboard.id }}";
+        
+        function init_charts() {
+            $.ajax({
+                type: "GET",
+                url: "/api/getDashboardCharts",
+                data: {
+                    dashboard_id: dashboard_id
+                },
+                success: function (charts) {
+                    charts.forEach((chart) => {
+                        draw_chart(chart);
+                    })
+                    $( function() {
+                        $(".charts_container").sortable();
+                        $( "charts_container" ).disableSelection();
+                    })
+                },
+                error: function (e) {
+                    alert("error");
+                },
+            });
+        }
+
+        function draw_chart(chart_conf) {
+            console.log("--------------");
+            console.log(chart_conf.id);
+            console.log("--------------");
+
+            var charts_container = document.querySelector('.charts_container');
+            var chart = document.createElement('div');
+            var chart_nav = document.createElement('div');
+            var chart_name = document.createElement('span');
+            var chart_icon = document.createElement('a');
+            var chart_icon_i = document.createElement('i');
+
+            chart.classList.add('chart');
+            chart_nav.classList.add('chart_nav');
+            chart_name.classList.add('chart_nav');
+            chart_icon.classList.add('icon_btn');
+            chart_icon_i.classList.add('fas');
+            chart_icon_i.classList.add('fa-cog');
+
+            chart.id = chart_conf.id;
+            chart_name.textContent = chart_conf.name;
+            chart.style.width = chart_conf.width;
+            chart.style.height = chart_conf.height;
+            chart_icon.href = "/dashboards/chart/" + chart.id;
+            chart_icon.addEventListener("click", redirect_to_chart_settings);
+
+            chart_icon.appendChild(chart_icon_i);
+            chart_nav.appendChild(chart_name);
+            chart_nav.appendChild(chart_icon);
+            chart.appendChild(chart_nav)
+            charts_container.appendChild(chart);
+
+            console.log('done')
+        }
+
+        init_charts();
 
         var add_chart_btn = document.querySelector("#add_chart_btn")
         add_chart_btn.addEventListener("click", () => {
@@ -43,9 +121,8 @@
                 data: {
                     dashboard_id: dashboard_id
                 },
-                success: async function (response) {
-                    getDashboardCharts();
-                    alert("created");
+                success: function (response) {
+                    add_new_chart(response);
                 },
                 error: function (e) {
                     alert("error");
@@ -53,26 +130,36 @@
             });
         })        
 
-        async function getDashboardCharts() {
-            $.ajax({
-                type: "GET",
-                url: "/api/getDashboardCharts",
-                data: {
-                    dashboard_id: dashboard_id
-                },
-                success: async function (response) {
-                    update_charts(response);
-                },
-                error: function (e) {
-                    alert("error");
-                },
-        });
+        function add_new_chart(response) {
+            var charts_container = document.querySelector('.charts_container');
+            var chart = document.createElement('div');
+            var chart_nav = document.createElement('div');
+            var chart_name = document.createElement('span');
+            var chart_icon = document.createElement('span');
+            var chart_icon_i = document.createElement('i');
 
-        function update_charts(data) {
-            console.log("lala");
-            console.log(data);
+            chart.classList.add('chart');
+            chart_nav.classList.add('chart_nav');
+            chart_name.classList.add('chart_nav');
+            chart_icon.classList.add('icon_btn');
+            chart_icon_i.classList.add('fas');
+            chart_icon_i.classList.add('fa-cog');
+
+            chart_name.textContent = response.name;
+            chart_icon.addEventListener("click", redirect_to_chart_settings);
+
+            // chart_icon.addEventListener("click", redirect_to_chart_settings)
+
+            chart_icon.appendChild(chart_icon_i);
+            chart_nav.appendChild(chart_name);
+            chart_nav.appendChild(chart_icon);
+            chart.appendChild(chart_nav)
+            charts_container.appendChild(chart);
         }
 
-        }        
+        function redirect_to_chart_settings() {
+            this.closest(".chart").id;
+        }
+
     </script>
 {% endblock %}

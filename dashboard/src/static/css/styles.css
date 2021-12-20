@@ -173,9 +173,17 @@ nav a {
     color: var(--nav-hover);
 }
 
+.charts_container {
+    display: flex;
+}
+
 .chart {
     background: rgba(255, 255, 255, 0.555);
-    margin: 1px;
+    margin-left: 10px;
+}
+
+.row {
+    color: var(--nav-fg);
 }
 
 /* CHART */

@@ -11,15 +11,10 @@ class Dashboard(db.Model):
         self.name = name
 
 
-# TODO
 class Row(db.Model):
-    pass
-
-
-class Chart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30))
-    prom_query = db.Column(db.String(30))
+    position = db.Column(db.Integer)
     dashboard_id = db.Column(
             db.Integer,
             db.ForeignKey('dashboard.id'),
@@ -27,6 +22,32 @@ class Chart(db.Model):
     )
     dashboard = db.relationship(
             'Dashboard',
+            backref=db.backref('rows', lazy=True)
+    )
+
+    def to_dict(self):
+        dct = {
+            "id": self.id,
+            "name": self.name,
+            "position": self.position,
+            "dashboard_id": self.dashboard_id,
+            "charts": [],
+        }
+        return dct
+
+
+class Chart(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30))
+    position = db.Column(db.Integer)
+    prom_query = db.Column(db.String(30))
+    row_id = db.Column(
+            db.Integer,
+            db.ForeignKey('row.id'),
+            nullable=False
+    )
+    row = db.relationship(
+            'Row',
             backref=db.backref('charts', lazy=True)
     )
 
@@ -41,6 +62,7 @@ class Chart(db.Model):
         dct = {
             "id": self.id,
             "name": self.name,
+            "position": self.position,
             "width": self.width,
             "min_width": self.min_width,
             "max_width": self.max_width,
@@ -48,6 +70,6 @@ class Chart(db.Model):
             "min_height": self.min_height,
             "max_height": self.max_height,
             "prom_query": self.prom_query,
-            "dashboard_id": self.dashboard_id
+            "row_id": self.row_id
         }
         return dct

@@ -31,16 +31,20 @@
     </div>
 
     <div class="rows_container">
-    </div>
-
-    <div class="charts_container">
-        <!-- {% for chart in charts %}
-            <div id="{{ chart.id }}" class="chart">
-                <div class="chart_nav">
-                    <span class="chart_name">{{ chart.name }}</span>
-                    <a class="icon_btn", href="{{ url_for('dashboards.chart_page', chart_id=chart.id) }}">
-                        <i class="fas fa-cog"></i>
-                    </a>
+        <!-- {% for row in rows|sort(attribute='position') %}
+            <div id="{{ row.id }}" class="row">
+                <div class="row_header">{{ row.name }}</div>
+                <div class="charts_container">
+                    {% for chart in row.charts|sort(attribute='position') %}
+                        <div id="{{ chart.id }}" class="chart">
+                            <div class="chart_nav">
+                                <span class="chart_name">{{ chart.name }}</span>
+                                <a class="icon_btn", href="{{ url_for('dashboards.chart_page', chart_id=chart.id) }}">
+                                    <i class="fas fa-cog"></i>
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         {% endfor %} -->
@@ -61,14 +65,24 @@
                 data: {
                     dashboard_id: dashboard_id
                 },
-                success: function (charts) {
-                    charts.forEach((chart) => {
-                        draw_chart(chart);
+                success: function (rows_conf) {
+                    var rows_container = document.querySelector('.rows_container');
+                    rows_conf.forEach((row_conf) => {
+                        console.log("aa");
+                        var row = get_row(row_conf);
+                        rows_container.appendChild(row);
+                        $( function() {
+                            qstring = "#" + row.id + " .charts_container";
+                            console.log(qstring);
+                            $(qstring).sortable();
+                            $(qstring).disableSelection();
+                        })
                     })
                     $( function() {
-                        $(".charts_container").sortable();
-                        $( "charts_container" ).disableSelection();
+                        $(".rows_container").sortable();
+                        $( "rows_container" ).disableSelection();
                     })
+                    console.log("DOONE");
                 },
                 error: function (e) {
                     alert("error");
@@ -76,12 +90,30 @@
             });
         }
 
-        function draw_chart(chart_conf) {
-            console.log("--------------");
-            console.log(chart_conf.id);
-            console.log("--------------");
+        function get_row(row_conf) {
+            var row = document.createElement('div');
+            var row_header = document.createElement('div');
+            var charts_container = document.createElement('div');
 
-            var charts_container = document.querySelector('.charts_container');
+
+            row.classList.add('row');
+            row_header.classList.add('row_header');
+            charts_container.classList.add('charts_container');
+
+            row.id = "row_" + row_conf.id;
+            row_header.textContent = row_conf.name;
+            row.appendChild(row_header);
+
+            row_conf.charts.forEach((chart_conf) => {
+                chart = draw_chart(chart_conf)
+                charts_container.appendChild(chart);
+            })
+
+            row.appendChild(charts_container);
+            return row;
+        }
+
+        function draw_chart(chart_conf) {
             var chart = document.createElement('div');
             var chart_nav = document.createElement('div');
             var chart_name = document.createElement('span');
@@ -95,34 +127,38 @@
             chart_icon_i.classList.add('fas');
             chart_icon_i.classList.add('fa-cog');
 
-            chart.id = chart_conf.id;
+            chart.id = "chart_" + chart_conf.id;
             chart_name.textContent = chart_conf.name;
             chart.style.width = chart_conf.width;
             chart.style.height = chart_conf.height;
-            chart_icon.href = "/dashboards/chart/" + chart.id;
+            chart_icon.href = "/dashboards/chart/" + chart.id.replace(
+                    "chart_", "");
             chart_icon.addEventListener("click", redirect_to_chart_settings);
 
             chart_icon.appendChild(chart_icon_i);
             chart_nav.appendChild(chart_name);
             chart_nav.appendChild(chart_icon);
             chart.appendChild(chart_nav)
-            charts_container.appendChild(chart);
 
-            console.log('done')
+            return chart;
         }
 
         init_charts();
 
-        var add_chart_btn = document.querySelector("#add_chart_btn")
-        add_chart_btn.addEventListener("click", () => {
+        var add_row_btn = document.querySelector("#add_row_btn");
+        add_row_btn.addEventListener("click", () => {
             $.ajax({
                 type: "POST",
-                url: "/api/createNewChart",
+                url: "/api/createNewRow",
                 data: {
                     dashboard_id: dashboard_id
                 },
-                success: function (response) {
-                    add_new_chart(response);
+                success: function (row_conf) {
+                    var row = get_row(row_conf);
+                    var rows_container = document.querySelector(
+                           ".rows_container");
+                    rows_container.insertBefore(
+                            row, rows_container.firstChild);
                 },
                 error: function (e) {
                     alert("error");
@@ -130,35 +166,35 @@
             });
         })        
 
-        function add_new_chart(response) {
-            var charts_container = document.querySelector('.charts_container');
-            var chart = document.createElement('div');
-            var chart_nav = document.createElement('div');
-            var chart_name = document.createElement('span');
-            var chart_icon = document.createElement('span');
-            var chart_icon_i = document.createElement('i');
+        // function add_new_chart(response) {
+        //     var charts_container = document.querySelector('.charts_container');
+        //     var chart = document.createElement('div');
+        //     var chart_nav = document.createElement('div');
+        //     var chart_name = document.createElement('span');
+        //     var chart_icon = document.createElement('span');
+        //     var chart_icon_i = document.createElement('i');
 
-            chart.classList.add('chart');
-            chart_nav.classList.add('chart_nav');
-            chart_name.classList.add('chart_nav');
-            chart_icon.classList.add('icon_btn');
-            chart_icon_i.classList.add('fas');
-            chart_icon_i.classList.add('fa-cog');
+        //     chart.classList.add('chart');
+        //     chart_nav.classList.add('chart_nav');
+        //     chart_name.classList.add('chart_nav');
+        //     chart_icon.classList.add('icon_btn');
+        //     chart_icon_i.classList.add('fas');
+        //     chart_icon_i.classList.add('fa-cog');
 
-            chart_name.textContent = response.name;
-            chart_icon.addEventListener("click", redirect_to_chart_settings);
+        //     chart_name.textContent = response.name;
+        //     chart_icon.addEventListener("click", redirect_to_chart_settings);
 
-            // chart_icon.addEventListener("click", redirect_to_chart_settings)
+        //     // chart_icon.addEventListener("click", redirect_to_chart_settings)
 
-            chart_icon.appendChild(chart_icon_i);
-            chart_nav.appendChild(chart_name);
-            chart_nav.appendChild(chart_icon);
-            chart.appendChild(chart_nav)
-            charts_container.appendChild(chart);
-        }
+        //     chart_icon.appendChild(chart_icon_i);
+        //     chart_nav.appendChild(chart_name);
+        //     chart_nav.appendChild(chart_icon);
+        //     chart.appendChild(chart_nav)
+        //     charts_container.appendChild(chart);
+        // }
 
         function redirect_to_chart_settings() {
-            this.closest(".chart").id;
+            this.closest(".chart").id.replace("chart_", "");
         }
 
     </script>

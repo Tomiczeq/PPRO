@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template
 from flask import abort
-from flask import current_app
 from views.models import Dashboard
 from views.models import Chart
+from views.models import Row
 
 dashboards = Blueprint('dashboards', __name__)
 
@@ -14,10 +14,12 @@ def dashboard_page(name):
     if not dashboard:
         abort(404)
 
-    charts = Chart.query.filter_by(dashboard_id=dashboard.id).all()
+    rows = Row.query.filter_by(dashboard_id=dashboard.id)
+    for row in rows:
+        row.charts = Chart.query.filter_by(row_id=row.id).all()
 
     return render_template(
-        "dashboard.html", dashboard=dashboard, charts=charts
+        "dashboard.html", dashboard=dashboard
     )
 
 

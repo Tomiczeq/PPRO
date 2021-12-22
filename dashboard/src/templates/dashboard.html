@@ -33,7 +33,21 @@
     <div class="rows_container">
         <!-- {% for row in rows|sort(attribute='position') %}
             <div id="{{ row.id }}" class="row">
-                <div class="row_header">{{ row.name }}</div>
+                <div class="row_header">
+                    <span>{{ row.name }}</span>
+                    <span class="icon_btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </span>
+                    <span class="icon_btn">
+                        <i class="fas fa-chevron-down"></i>
+                    </span>
+                    <span class="icon_btn">
+                        <i class="fas fa-plus"></i>
+                    </span>
+                    <span class="icon_btn">
+                        <i class="fas fa-trash"></i>
+                    </span>
+                </div>
                 <div class="charts_container">
                     {% for chart in row.charts|sort(attribute='position') %}
                         <div id="{{ chart.id }}" class="chart">
@@ -57,7 +71,39 @@
     <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
     <script>
         const dashboard_id = "{{ dashboard.id }}";
-        
+        var g_rows_conf = {};
+        $( function() {
+            $(".rows_container").sortable();
+        })
+
+        var add_row_btn = document.querySelector("#add_row_btn");
+        add_row_btn.addEventListener("click", () => {
+            add_row();
+        }); 
+
+        var add_row_btn = document.querySelector("#save_dashboard_btn");
+        add_row_btn.addEventListener("click", () => {
+            actualize_g_rows_conf();
+            save_dashboard();
+        }); 
+
+        function save_dashboard() {
+            $.ajax({
+                type: "POST",
+                url: "/api/saveDashboard",
+                data: {
+                    dashboard_id: dashboard_id,
+                    rows_conf: JSON.stringify(g_rows_conf),
+                },
+                success: function (rows_conf) {
+                    alert("yeah");
+                },
+                error: function (e) {
+                    alert("error");
+                },
+            });
+        }
+
         function init_charts() {
             $.ajax({
                 type: "GET",
@@ -66,23 +112,8 @@
                     dashboard_id: dashboard_id
                 },
                 success: function (rows_conf) {
-                    var rows_container = document.querySelector('.rows_container');
-                    rows_conf.forEach((row_conf) => {
-                        console.log("aa");
-                        var row = get_row(row_conf);
-                        rows_container.appendChild(row);
-                        $( function() {
-                            qstring = "#" + row.id + " .charts_container";
-                            console.log(qstring);
-                            $(qstring).sortable();
-                            $(qstring).disableSelection();
-                        })
-                    })
-                    $( function() {
-                        $(".rows_container").sortable();
-                        $( "rows_container" ).disableSelection();
-                    })
-                    console.log("DOONE");
+                    g_rows_conf = rows_conf;
+                    draw_rows(rows_conf);
                 },
                 error: function (e) {
                     alert("error");
@@ -90,30 +121,232 @@
             });
         }
 
+        function sortByPosition(a, b) {
+            return a[1] - b[1];
+        }
+
+        function get_sorted_by_position(elems_dict) {
+            var arr = []
+            for (var elem_id in elems_dict) {
+                arr.push([elem_id, elems_dict[elem_id]["position"]]);
+            }
+            arr.sort(sortByPosition);
+            sorted_ids = []
+            arr.forEach((elem) => {
+                sorted_ids.push(elem[0])
+            })
+            return sorted_ids;
+        }
+        
+        function draw_rows(rows_conf) {
+            var rows_container = document.querySelector('.rows_container');
+            sorted = get_sorted_by_position(rows_conf);
+            sorted.forEach((row_id) => {
+                var row = get_row(rows_conf[row_id]);
+                rows_container.appendChild(row);
+                $( function() {
+                    qstring = "#" + row.id + " .charts_container";
+                    $(qstring).sortable({
+                        connectWith: ".charts_container",
+                    });
+                })
+            })
+        }
+
+        function create_id(prefix){
+            var id = prefix + Math.random().toString(36).substr(2, 10);
+            return id;
+        }
+
+        function add_row() {
+            row_conf = get_new_row();
+            g_rows_conf[row_conf.id] = row_conf;
+            row_elem = get_row(row_conf);
+            insert_row(row_elem);
+            qstring = "#" + row_elem.id + " .charts_container";
+            $(qstring).sortable({
+                connectWith: ".charts_container",
+            });
+        }
+
+        function insert_row(row_elem) {
+            var rows_container = document.querySelector(".rows_container");
+            rows_container.insertBefore(row_elem, rows_container.firstChild);
+        }
+
+        function get_new_row() {
+            row_conf = {
+                "id": create_id("row_"),
+                "dashboard_id": dashboard_id,
+                "name": "New Row " + num_elems('.row_name', 'New Row'),
+                "position": 0,
+                "charts": {}
+            };
+            return row_conf;
+        }
+
+        function get_icon(cls, id) {
+            var span = document.createElement('span');
+            span.classList.add('icon_btn');
+
+            if (id) {
+                span.id = id;
+            }
+
+            var chart_icon = document.createElement('i');
+            chart_icon.className = cls;
+            span.appendChild(chart_icon);
+            return span
+        }
+
         function get_row(row_conf) {
             var row = document.createElement('div');
             var row_header = document.createElement('div');
+            var row_name = document.createElement('span');
             var charts_container = document.createElement('div');
 
+            var show_btn = get_icon("fas fa-chevron-right", null);
+            var hide_btn = get_icon("fas fa-chevron-down", null);
+            var add_chart_btn = get_icon("fas fa-plus", null);
+            var delete_row_btn = get_icon("fas fa-trash", null);
+
+            show_btn.style.display = "none";
+            show_btn.addEventListener("click", () => {
+                show_btn.style.display = "none";
+                hide_btn.style.display = "";
+                charts_container.style.display = "";
+                
+            });
+            hide_btn.addEventListener("click", () => {
+                show_btn.style.display = "";
+                hide_btn.style.display = "none";
+                charts_container.style.display = "none";
+            });
+
+            add_chart_btn.addEventListener("click", () => {
+                add_chart(row_conf.id)
+            });
+            delete_row_btn.addEventListener("click", () => {
+                delete_row(row_conf.id)
+            });
 
             row.classList.add('row');
             row_header.classList.add('row_header');
+            row_name.classList.add('row_name');
             charts_container.classList.add('charts_container');
 
-            row.id = "row_" + row_conf.id;
-            row_header.textContent = row_conf.name;
+            row.id = row_conf.id;
+            row_name.textContent = row_conf.name;
+            row_header.appendChild(row_name);
+            row_header.appendChild(show_btn);
+            row_header.appendChild(hide_btn);
+            row_header.appendChild(add_chart_btn);
+            row_header.appendChild(delete_row_btn);
             row.appendChild(row_header);
 
-            row_conf.charts.forEach((chart_conf) => {
-                chart = draw_chart(chart_conf)
+            sorted_charts_ids = get_sorted_by_position(row_conf.charts);
+            sorted_charts_ids.forEach((chart_id) => {
+                var chart_conf = row_conf.charts[chart_id];
+                var chart = get_chart(chart_conf);
                 charts_container.appendChild(chart);
             })
 
             row.appendChild(charts_container);
             return row;
         }
+        
+        function actualize_g_rows_conf() {
+            rows = document.querySelectorAll(".row");
+            charts = {};
 
-        function draw_chart(chart_conf) {
+            for (var row_id in g_rows_conf) {
+                var row_charts = g_rows_conf[row_id].charts;
+                for (var chart_id in row_charts) {
+                    charts[chart_id] = row_charts[chart_id];
+                }
+            }
+
+            new_g_rows_conf = {};
+            var position = 0
+            rows.forEach((row) => {
+
+                row_conf = g_rows_conf[row.id];
+                row_conf.position = position;
+                row_conf.charts = get_row_charts(row.id, charts);
+                new_g_rows_conf[row.id] = row_conf;
+                position += 1;
+
+            });
+            g_rows_conf = new_g_rows_conf;
+        }
+
+        function get_row_charts(row_id, charts) {
+            current_charts = document.querySelectorAll('#' + row_id + ' .chart');
+            charts_conf = {}
+
+            var position = 0
+            current_charts.forEach((chart) => {
+                chart_conf = charts[chart.id];
+                chart_conf.position = position;
+                chart_conf.row_id = row_id;
+                charts_conf[chart.id] = chart_conf
+                position += 1;
+            })
+            return charts_conf
+        }
+
+        function delete_row(row_id) {
+            actualize_g_rows_conf();
+            delete g_rows_conf[row_id];
+            document.getElementById(row_id).remove();
+        }
+
+        function delete_chart(chart_id) {
+            actualize_g_rows_conf();
+            chart = document.getElementById(chart_id);
+            row_id = chart.closest(".row").id;
+            delete g_rows_conf[row_id].charts[chart_id];
+
+        }
+
+        function add_chart(row_id) {
+            chart_conf = get_new_chart(row_id);
+            g_rows_conf[row_id].charts[chart_conf.id] = chart_conf;
+            chart_elem = get_chart(chart_conf);
+            insert_chart(chart_elem, row_id);
+        }
+
+        function num_elems(identifier, substring) {
+            var elems = document.querySelectorAll(identifier);
+            var i = 0;
+            elems.forEach((elem) => {
+                if (elem.textContent.includes(substring)) {
+                    i += 1;
+                }
+            })
+            return i;
+        }
+
+        function get_new_chart(row_id) {
+            chart_conf = {
+                "id": create_id("chart_"),
+                "prom_query": null,
+                "row_id": row_id,
+                "name": "New Chart " + num_elems('.chart_name', 'New Chart'),
+                "position": 0,
+                "style": {
+                    "width": "20%",
+                    "min_width": null,
+                    "max_width": null,
+                    "height": "200px",
+                    "min_height": null,
+                    "max_height": null,
+                }
+            }
+            return chart_conf;
+        }
+
+        function get_chart(chart_conf) {
             var chart = document.createElement('div');
             var chart_nav = document.createElement('div');
             var chart_name = document.createElement('span');
@@ -122,17 +355,23 @@
 
             chart.classList.add('chart');
             chart_nav.classList.add('chart_nav');
-            chart_name.classList.add('chart_nav');
+            chart_name.classList.add('chart_name');
             chart_icon.classList.add('icon_btn');
             chart_icon_i.classList.add('fas');
             chart_icon_i.classList.add('fa-cog');
 
-            chart.id = "chart_" + chart_conf.id;
+            chart.id = chart_conf.id;
             chart_name.textContent = chart_conf.name;
-            chart.style.width = chart_conf.width;
-            chart.style.height = chart_conf.height;
-            chart_icon.href = "/dashboards/chart/" + chart.id.replace(
-                    "chart_", "");
+
+            console.log(chart_conf);
+
+            for (var style in chart_conf.style) {
+                value = chart_conf.style[style];
+                if (value) {
+                    chart.style[style] = value;
+                }
+            }
+            chart_icon.href = "/dashboards/chart/" + chart.id;
             chart_icon.addEventListener("click", redirect_to_chart_settings);
 
             chart_icon.appendChild(chart_icon_i);
@@ -143,28 +382,17 @@
             return chart;
         }
 
-        init_charts();
+        function insert_chart(chart_elem, row_id) {
+            charts_container_id = '#' + row_id + " .charts_container";
+            var charts_container = document.querySelector(charts_container_id);
+            charts_container.insertBefore(chart_elem, charts_container.firstChild);
+        }
 
-        var add_row_btn = document.querySelector("#add_row_btn");
-        add_row_btn.addEventListener("click", () => {
-            $.ajax({
-                type: "POST",
-                url: "/api/createNewRow",
-                data: {
-                    dashboard_id: dashboard_id
-                },
-                success: function (row_conf) {
-                    var row = get_row(row_conf);
-                    var rows_container = document.querySelector(
-                           ".rows_container");
-                    rows_container.insertBefore(
-                            row, rows_container.firstChild);
-                },
-                error: function (e) {
-                    alert("error");
-                },
-            });
-        })        
+        // TODO
+        function updateDashboard() {
+        }
+
+        init_charts();
 
         // function add_new_chart(response) {
         //     var charts_container = document.querySelector('.charts_container');

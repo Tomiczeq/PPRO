@@ -1,3 +1,4 @@
+import json
 from flask import request
 from flask import Blueprint
 from flask import make_response
@@ -8,6 +9,35 @@ from views.models import Chart
 from views.models import Row
 
 api = Blueprint('api', __name__)
+
+
+@api.route("/saveDashboard", methods=["POST"])
+def saveDashboard():
+    dashboard_id = request.form.get('dashboard_id')
+    rows_conf = json.loads(request.form.get('rows_conf'))
+
+    dashboard = Dashboard.query.get(dashboard_id)
+    if not dashboard:
+        return make_response("Not found\n", 404)
+
+    rows = Row.query.filter_by(dashboard_id=dashboard.id)
+    for row in rows:
+        charts = Chart.query.filter_by(row_id=row.id)
+        for chart in charts:
+            db.session.delete(chart)
+        db.session.delete(row)
+
+    if rows_conf:
+        for row_id, row_conf in rows_conf.items():
+            row = Row.from_conf(row_conf)
+            db.session.add(row)
+
+            for chart_id, chart_conf in row_conf["charts"].items():
+                chart = Chart.from_conf(chart_conf)
+                db.session.add(chart)
+
+    db.session.commit()
+    return make_response("", 200)
 
 
 @api.route("/getDashboardCharts", methods=["GET"])
@@ -22,14 +52,13 @@ def get_dashboard_charts():
         return make_response("Not found\n", 404)
 
     rows = Row.query.filter_by(dashboard_id=dashboard.id)
-    rows = sorted([row.to_dict() for row in rows], key=lambda x: x["position"])
-    for row in rows:
-        charts = Chart.query.filter_by(row_id=row["id"])
-        row["charts"] = sorted(
-            [chart.to_dict() for chart in charts], key=lambda x: x["position"]
-        )
+    rows_conf = {row.id: row.to_dict() for row in rows}
 
-    return jsonify(rows)
+    for row_id, row_conf in rows_conf.items():
+        charts = Chart.query.filter_by(row_id=row_id)
+        row_conf["charts"] = {chart.id: chart.to_dict() for chart in charts}
+
+    return jsonify(rows_conf)
 
 
 @api.route("/createNewRow", methods=["POST"])

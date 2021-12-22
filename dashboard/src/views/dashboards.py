@@ -20,6 +20,7 @@ def dashboard_page(name):
 
     return render_template(
         "dashboard.html", dashboard=dashboard
+        # "dashboard.html", dashboard=dashboard, rows=rows
     )
 
 

@@ -12,7 +12,7 @@ class Dashboard(db.Model):
 
 
 class Row(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(30), primary_key=True)
     name = db.Column(db.String(30))
     position = db.Column(db.Integer)
     dashboard_id = db.Column(
@@ -35,14 +35,24 @@ class Row(db.Model):
         }
         return dct
 
+    @staticmethod
+    def from_conf(conf):
+        row = Row()
+        for k, v in conf.items():
+            if k == "charts":
+                continue
+            else:
+                setattr(row, k, v)
+        return row
+
 
 class Chart(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(30), primary_key=True)
     name = db.Column(db.String(30))
     position = db.Column(db.Integer)
     prom_query = db.Column(db.String(30))
     row_id = db.Column(
-            db.Integer,
+            db.String(30),
             db.ForeignKey('row.id'),
             nullable=False
     )
@@ -63,13 +73,26 @@ class Chart(db.Model):
             "id": self.id,
             "name": self.name,
             "position": self.position,
-            "width": self.width,
-            "min_width": self.min_width,
-            "max_width": self.max_width,
-            "height": self.height,
-            "min_height": self.min_height,
-            "max_height": self.max_height,
+            "row_id": self.row_id,
             "prom_query": self.prom_query,
-            "row_id": self.row_id
+            "style": {
+                "width": self.width,
+                "min_width": self.min_width,
+                "max_width": self.max_width,
+                "height": self.height,
+                "min_height": self.min_height,
+                "max_height": self.max_height,
+            }
         }
         return dct
+
+    @staticmethod
+    def from_conf(conf):
+        chart = Chart()
+        for k, v in conf.items():
+            if k == "style":
+                for kk, vv in v.items():
+                    setattr(chart, kk, vv)
+            else:
+                setattr(chart, k, v)
+        return chart

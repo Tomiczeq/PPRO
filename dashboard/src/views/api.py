@@ -1,14 +1,79 @@
+import os
 import json
+import requests
 from flask import request
 from flask import Blueprint
 from flask import make_response
 from flask import jsonify
 from views.models import db
 from views.models import Dashboard
+from views.models import Datasource
 from views.models import Chart
 from views.models import Row
+from flask import current_app
 
 api = Blueprint('api', __name__)
+
+
+@api.route("/getDatasource", methods=["GET"])
+def getDatasource():
+    datasources = Datasource.query.all()
+    datasources = [datasource.to_dict() for datasource in datasources]
+    return make_response(jsonify(datasources), 200)
+
+
+@api.route("/prometheusRequest", methods=["GET"])
+def prometheusRequest():
+    request_conf = json.loads(request.args.get('request_conf'))
+    params = {
+        "query": request_conf["prom_query"],
+    }
+
+    if request_conf["instant"]:
+        query_type = "query"
+        params["time"] = request_conf["end"]
+    else:
+        query_type = "query_range"
+        params["step"] = request_conf["step"]
+        params["start"] = request_conf["start"]
+        params["end"] = request_conf["end"]
+
+    current_app.logger.info(f"params: {params}")
+
+    query_prefix = os.path.join("api/v1", query_type)
+
+    datasource = Datasource.query.first()
+    current_app.logger.info(f"datasource: {datasource}")
+    current_app.logger.info(f"datasource_url: {datasource.url}")
+    prom_url = os.path.join(datasource.url, query_prefix)
+    current_app.logger.info(f"prom_url: {prom_url}")
+    # prom_url = 'http://localhost:9090/api/v1/query_range?query=errors_total&start=2021-12-22T16:05:36.111Z&end=2021-12-23T11:16:05.111Z&step=1m'
+    response = requests.get(prom_url, params=params)
+    current_app.logger.info(f"response.text: {response.text}")
+
+    if response.status_code != 200:
+        make_response("", response.status_code)
+
+    return make_response(jsonify(response.json()), 200)
+
+
+@api.route("/updateDatasource", methods=["POST"])
+def updateDatasource():
+    datasources = Datasource.query.all()
+    for datasource in datasources:
+        db.session.delete(datasource)
+
+    datasource = Datasource()
+    url = request.form.get('datasource_url')
+
+    if isinstance(url, str):
+        datasource.url = url
+    else:
+        return make_response("Bad request\n", 400)
+
+    db.session.add(datasource)
+    db.session.commit()
+    return make_response("", 200)
 
 
 @api.route("/saveDashboard", methods=["POST"])

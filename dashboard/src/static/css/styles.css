@@ -17,6 +17,11 @@
     --search_hover: var(--nav-hover);
 
     --dashboard_fg: var(--nav-fg);
+
+    --settings-nav-bg: #1f3d55;
+    --settings-nav-li: #33648d;
+    --settings-nav-li-hover: #4b97d4;
+    --settings-nav-li-selected: #4bd4a6;     
 }
 
 * {
@@ -250,4 +255,76 @@ nav a {
     display: flex;
     flex-direction: column;
 
+}
+
+/* CHART SETTINGS PAGE */
+
+.chartconf_container {
+    display: none;
+}
+
+.chartconf_content {
+    display: flex;
+    justify-content: center;
+}
+
+.chartconf_content_hidden {
+    display: none;
+}
+
+.query_options {
+    display: flex;
+}
+
+#prom_query {
+    width: 300px;
+}
+
+#query_step {
+    width: 60px;
+}
+
+.chartconf_nav {
+    display: flex;
+    position: relative;
+    background: var(--settings-nav-bg);
+    align-items: flex-end;
+    justify-content: center;
+    width: 100%;
+    height: 80px;
+}
+
+.chartconf_nav ul {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.chartconf_nav ul li {
+    padding: 12px 25px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    transition: all 0.5s ease;
+    cursor: pointer;
+}
+
+.chartconf_nav_li {
+    color: var(--settings-nav-li)
+}
+
+.chartconf_nav_li:hover {
+    color: var(--settings-nav-li-hover)
+}
+
+.chartconf_nav_li_selected {
+    color: var(--settings-nav-li-selected)
+}
+
+/* SETTINGS */
+
+.options {
+    display: flex;
+    flex-direction: column;
 }

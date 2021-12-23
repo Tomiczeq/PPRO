@@ -3,6 +3,17 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
+class Datasource(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    url = db.Column(db.String(30))
+
+    def to_dict(self):
+        dct = {
+            "url": self.url,
+        }
+        return dct
+
+
 class Dashboard(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30))
@@ -51,6 +62,9 @@ class Chart(db.Model):
     name = db.Column(db.String(30))
     position = db.Column(db.Integer)
     prom_query = db.Column(db.String(30))
+    step = db.Column(db.String(30))
+    instant = db.Column(db.Boolean)
+
     row_id = db.Column(
             db.String(30),
             db.ForeignKey('row.id'),
@@ -75,6 +89,8 @@ class Chart(db.Model):
             "position": self.position,
             "row_id": self.row_id,
             "prom_query": self.prom_query,
+            "step": self.step,
+            "instant": self.instant,
             "style": {
                 "width": self.width,
                 "min_width": self.min_width,

@@ -5,6 +5,7 @@ from flask import render_template
 from flask import url_for
 from views.models import db
 from views.models import Dashboard
+from views.models import Datasource
 
 home = Blueprint('home', __name__)
 
@@ -20,9 +21,16 @@ def search_page_get():
     return render_template("search.html", dashboards=dashboards)
 
 
+@home.route("/settings", methods=["GET"])
+def settings_get():
+    datasource = Datasource.query.first()
+    return render_template("settings.html", datasource=datasource)
+
+
 @home.route("/create", methods=["GET"])
 def create_get():
     return render_template("create.html")
+
 
 @home.route("/create", methods=["POST"])
 def create_post():

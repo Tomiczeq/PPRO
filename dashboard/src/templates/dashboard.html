@@ -9,6 +9,15 @@
             <span>{{ dashboard.name }}</span>
         </div>
         <div class="dashboard_btns">
+            <span class="date_range">
+                <span>start</span>
+                <input id="query_start" type="text">
+            </span>
+            <span class="date_range">
+                <span>end</span>
+                <input id="query_end" type="text">
+            </span>
+
             <span id="explore_btn" class="icon_btn">
                 <i class="fas fa-eye"></i>
             </span>
@@ -64,14 +73,78 @@
         {% endfor %} -->
     </div>
 
+    <div class="chartconf_container">
+
+        <div class="chartconf_header"></div>
+
+        <div class="chartconf_chart"></div>
+
+        <div class="chartconf_nav">
+            <ul>
+                <li id="chartconf_general_btn", class="chartconf_nav_li">
+                    general
+                </li>
+                <li id="chartconf_query_btn", class="chartconf_nav_li">
+                    query
+                </li>
+                <li id="chartconf_visualization_btn", class="chartconf_nav_li">
+                    Visualisation
+                </li>
+                <li id="chartconf_axes_btn", class="chartconf_nav_li">
+                    axes
+                </li>
+                <li id="chartconf_display_btn", class="chartconf_nav_li">
+                    display
+                </li>
+            </ul>
+        </div>
+
+        <!-- Obsah jednotlivych nastaveni -->
+        <div class="chartconf_wrapper">
+            <div class="chartconf_content_hidden", id="chartconf_general_container">
+            </div>
+
+            <div class="chartconf_content_hidden", id="chartconf_query_container">
+                <div class="query_wrapper">
+                    <div class="query">
+                        <span>query:</span>
+                        <input type="text" id="prom_query">
+                    </div>
+                    <div class="query_options">
+                        <div>
+                            <span>step</span>
+                            <input id="query_step" type="text">
+                        </div>
+                        <div>
+                            <span>instant</span>
+                            <input type="checkbox", id="query_type">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chartconf_content_hidden", id="chartconf_visualization_container">
+            </div>
+
+            <div class="chartconf_content_hidden", id="chartconf_axes_container">
+            </div>
+
+            <div class="chartconf_content_hidden", id="chartconf_display_container">
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
 
 
 {% block scripts %}
     <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+    <script src="{{ url_for('static', filename='js/chartconf.js') }}"></script>
+
     <script>
         const dashboard_id = "{{ dashboard.id }}";
         var g_rows_conf = {};
+        var g_current_chart_id = null;
         $( function() {
             $(".rows_container").sortable();
         })
@@ -280,6 +353,31 @@
             g_rows_conf = new_g_rows_conf;
         }
 
+        function actualize_g_chart_conf(chart_conf) {
+            g_rows_conf[chart_conf.row_id].charts[chart_conf.id] = chart_conf;
+        }
+
+        function get_chart_conf_by_id(wanted_chart_id) {
+            actualize_g_rows_conf();
+            rows = document.querySelectorAll(".row");
+            charts = {};
+
+            for (var row_id in g_rows_conf) {
+                row_conf = g_rows_conf[row_id];
+                for(var chart_id in row_conf.charts) {
+                    if (chart_id = wanted_chart_id) {
+                        return row_conf.charts[chart_id]
+                    }
+                }
+            }
+
+            alert("Cannot get chart conf by id");
+        }
+
+        function get_current_chart_conf() {
+            return get_chart_conf_by_id(g_current_chart_id);
+        }
+
         function get_row_charts(row_id, charts) {
             current_charts = document.querySelectorAll('#' + row_id + ' .chart');
             charts_conf = {}
@@ -334,6 +432,8 @@
                 "row_id": row_id,
                 "name": "New Chart " + num_elems('.chart_name', 'New Chart'),
                 "position": 0,
+                "step": "1m",
+                "instant": false,
                 "style": {
                     "width": "20%",
                     "min_width": null,
@@ -350,7 +450,7 @@
             var chart = document.createElement('div');
             var chart_nav = document.createElement('div');
             var chart_name = document.createElement('span');
-            var chart_icon = document.createElement('a');
+            var chart_icon = document.createElement('span');
             var chart_icon_i = document.createElement('i');
 
             chart.classList.add('chart');
@@ -371,8 +471,11 @@
                     chart.style[style] = value;
                 }
             }
-            chart_icon.href = "/dashboards/chart/" + chart.id;
-            chart_icon.addEventListener("click", redirect_to_chart_settings);
+            chart_icon.addEventListener("click", () => {
+                chart_conf = get_chart_conf_by_id(chart_conf.id)
+                g_current_chart_id = chart_conf.id
+                show_chart_settings(chart_conf);
+            });
 
             chart_icon.appendChild(chart_icon_i);
             chart_nav.appendChild(chart_name);
@@ -393,37 +496,6 @@
         }
 
         init_charts();
-
-        // function add_new_chart(response) {
-        //     var charts_container = document.querySelector('.charts_container');
-        //     var chart = document.createElement('div');
-        //     var chart_nav = document.createElement('div');
-        //     var chart_name = document.createElement('span');
-        //     var chart_icon = document.createElement('span');
-        //     var chart_icon_i = document.createElement('i');
-
-        //     chart.classList.add('chart');
-        //     chart_nav.classList.add('chart_nav');
-        //     chart_name.classList.add('chart_nav');
-        //     chart_icon.classList.add('icon_btn');
-        //     chart_icon_i.classList.add('fas');
-        //     chart_icon_i.classList.add('fa-cog');
-
-        //     chart_name.textContent = response.name;
-        //     chart_icon.addEventListener("click", redirect_to_chart_settings);
-
-        //     // chart_icon.addEventListener("click", redirect_to_chart_settings)
-
-        //     chart_icon.appendChild(chart_icon_i);
-        //     chart_nav.appendChild(chart_name);
-        //     chart_nav.appendChild(chart_icon);
-        //     chart.appendChild(chart_nav)
-        //     charts_container.appendChild(chart);
-        // }
-
-        function redirect_to_chart_settings() {
-            this.closest(".chart").id.replace("chart_", "");
-        }
 
     </script>
 {% endblock %}

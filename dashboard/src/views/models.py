@@ -62,6 +62,7 @@ class Chart(db.Model):
     name = db.Column(db.String(30))
     position = db.Column(db.Integer)
     prom_query = db.Column(db.String(30))
+    legend = db.Column(db.String(30))
     step = db.Column(db.String(30))
     instant = db.Column(db.Boolean)
 
@@ -90,6 +91,7 @@ class Chart(db.Model):
             "row_id": self.row_id,
             "prom_query": self.prom_query,
             "step": self.step,
+            "legend": self.legend,
             "instant": self.instant,
             "style": {
                 "width": self.width,
@@ -109,6 +111,9 @@ class Chart(db.Model):
             if k == "style":
                 for kk, vv in v.items():
                     setattr(chart, kk, vv)
+            elif k == "visualization":
+                # TODO
+                pass
             else:
                 setattr(chart, k, v)
         return chart

@@ -112,6 +112,10 @@
                     </div>
                     <div class="query_options">
                         <div>
+                            <span>legend</span>
+                            <input id="query_legend" type="text">
+                        </div>
+                        <div>
                             <span>step</span>
                             <input id="query_step" type="text">
                         </div>
@@ -124,6 +128,32 @@
             </div>
 
             <div class="chartconf_content_hidden", id="chartconf_visualization_container">
+                <ul>
+                    <li>
+                        <span class="icon_btn_selected chart_vis" id="">
+                            <i class="fas fa-chart-line"></i>
+                        </span>
+                        <span class="icon_btn chart_vis" id="">
+                            <i class="fas fa-chart-pie"></i>
+                        </span>
+                    </li>
+                    <li>
+                        <span class="icon_btn chart_vis" id="">
+                            <i class="fas fa-chart-area"></i>
+                        </span>
+                        <span class="icon_btn chart_vis" id="">
+                            <i class="fas fa-table"></i>
+                        </span>
+                    </li>
+                    <li>
+                        <span class="icon_btn chart_vis" id="">
+                            <i class="fas fa-chart-bar"></i>
+                        </span>
+                        <span class="icon_btn chart_vis" id="">
+                            <i class="far fa-life-ring"></i>
+                        </span>
+                    </li>
+                </ul>
             </div>
 
             <div class="chartconf_content_hidden", id="chartconf_axes_container">
@@ -425,6 +455,64 @@
             return i;
         }
 
+        function get_default_options(type) {
+            if (type = "line") {
+                options = {
+                    "curve": "straight",
+                    "lineWidth": 5,
+                    "type": "line",
+                    "stacked": false,
+                    "legend": false,
+                    "units": 'numeric'
+                }
+            } else if (type = "column") {
+                options = {
+                    "curve": "straight",
+                    "lineWidth": 5,
+                    "type": "line",
+                    "stacked": false,
+                    "legend": false,
+                    "units": 'numeric'
+                }
+            } else if (type = "column") {
+                options = {
+                    "type": "column",
+                    "stacked": false,
+                    "legend": false,
+                    "units": 'numeric'
+                }
+            } else if (type = "area") {
+                options = {
+                    "curve": "straight",
+                    "lineWidth": 5,
+                    "type": "line",
+                    "stacked": false,
+                    "legend": false,
+                    "units": 'numeric',
+                    "fill" : {
+                        "type": 'solid'
+                    }
+                }
+            } else if (type = "pie") {
+                options = {
+                    "legend": false,
+                }
+            } else if (type = "donut") {
+                options = {
+                    "legend": false
+                }
+            } 
+        }
+
+        function fill_charts() {
+            for (var row_id in g_rows_conf) {
+                charts = g_rows_conf[row_id].charts;
+                for (var chart_id in charts) {
+                    var chart_conf = charts[chart_id]
+                }
+            }
+        }
+
         function get_new_chart(row_id) {
             chart_conf = {
                 "id": create_id("chart_"),
@@ -432,8 +520,13 @@
                 "row_id": row_id,
                 "name": "New Chart " + num_elems('.chart_name', 'New Chart'),
                 "position": 0,
+                "legend": null,
                 "step": "1m",
                 "instant": false,
+                "visualization": {
+                    "type": "line",
+                    "options": get_default_options("line")
+                },
                 "style": {
                     "width": "20%",
                     "min_width": null,

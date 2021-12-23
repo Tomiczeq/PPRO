@@ -8,6 +8,9 @@ function show_chart_settings(chart_conf) {
     if (chart_conf.prom_query) {
         document.querySelector("#prom_query").value = chart_conf.prom_query;
     }
+    if (chart_conf.legend) {
+        document.querySelector("#query_legend").value = chart_conf.legend;
+    }
     document.querySelector("#query_step").value = chart_conf.step;
     document.querySelector("#query_type").checked = chart_conf.instant;
 
@@ -106,6 +109,22 @@ function init() {
         }
     }); 
 
+    var query_legend = document.getElementById("query_legend");
+    query_legend.addEventListener("keyup", function(event) {
+        // Number 13 is the "Enter" key on the keyboard
+        if (event.keyCode === 13) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+
+            var legend = query_legend.value;
+
+            chart_conf = get_current_chart_conf();
+            chart_conf.legend = legend;
+            actualize_g_chart_conf(chart_conf);
+            get_prom_data(chart_conf);
+        }
+    }); 
+
     var query_step = document.getElementById("query_step");
     query_step.addEventListener("keyup", function(event) {
         // Number 13 is the "Enter" key on the keyboard
@@ -127,7 +146,7 @@ function init() {
         chart_conf = get_current_chart_conf();
         chart_conf.instant = this.checked;
         actualize_g_chart_conf(chart_conf);
-        actualize_chart(chart_conf, "chartconf_chart")
+        get_prom_data(chart_conf);
     });
 
 }

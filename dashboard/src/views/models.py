@@ -1,3 +1,4 @@
+import json
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -17,9 +18,11 @@ class Datasource(db.Model):
 class Dashboard(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30))
+    timerange = db.Column(db.String(30))
 
     def __init__(self, name):
         self.name = name
+        self.timerange = "1h"
 
 
 class Row(db.Model):
@@ -61,10 +64,11 @@ class Chart(db.Model):
     id = db.Column(db.String(30), primary_key=True)
     name = db.Column(db.String(30))
     position = db.Column(db.Integer)
-    prom_query = db.Column(db.String(30))
+    prom_query = db.Column(db.String(1000))
     legend = db.Column(db.String(30))
     step = db.Column(db.String(30))
     instant = db.Column(db.Boolean)
+    visualization = db.Column(db.String(2000))
 
     row_id = db.Column(
             db.String(30),
@@ -93,6 +97,7 @@ class Chart(db.Model):
             "step": self.step,
             "legend": self.legend,
             "instant": self.instant,
+            "visualization": json.loads(self.visualization),
             "style": {
                 "width": self.width,
                 "min_width": self.min_width,
@@ -112,8 +117,7 @@ class Chart(db.Model):
                 for kk, vv in v.items():
                     setattr(chart, kk, vv)
             elif k == "visualization":
-                # TODO
-                pass
+                setattr(chart, k, json.dumps(v))
             else:
                 setattr(chart, k, v)
         return chart

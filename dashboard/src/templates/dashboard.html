@@ -6,23 +6,19 @@
 
     <div class="dashboard_navbar">
         <div class="dashboard_profile">
+            <span id="back_btn" class="hidden">
+                <i class="fas fa-arrow-left"></i>
+            </span>
             <span>{{ dashboard.name }}</span>
         </div>
         <div class="dashboard_btns">
             <span class="date_range">
-                <span>start</span>
-                <input id="query_start" type="text">
-            </span>
-            <span class="date_range">
-                <span>end</span>
-                <input id="query_end" type="text">
+                <span>last</span>
+                <input id="query_last" type="text" value="{{ dashboard.timerange }}">
             </span>
 
-            <span id="explore_btn" class="icon_btn">
-                <i class="fas fa-eye"></i>
-            </span>
-            <span id="move_btn" class="icon_btn">
-                <i class="fas fa-expand-arrows-alt"></i>
+            <span id="timerange_btn" class="icon_btn">
+                <i class="far fa-clock"></i>
             </span>
             <span class="icon_btn" id="add_row_btn">
                 <i class="fas fa-plus"></i>
@@ -30,13 +26,39 @@
             <span class="icon_btn" id="save_dashboard_btn">
                 <i class="fas fa-save"></i>
             </span>
-            <span class="icon_btn" id="dashboard_settings_btn">
-                <i class="fas fa-cog"></i>
-            </span>
             <span class="icon_btn" id="refresh_dashboard_btn">
                 <i class="fas fa-sync"></i>
             </span>
         </div>
+    </div>
+
+    <div class="timerange_container">
+        <ul>
+            <li id="timerange_5m">
+                Last 5 minutes
+            </li>
+            <li id="timerange_15m">
+                Last 15 minutes
+            </li>
+            <li id="timerange_30m">
+                Last 30 minutes
+            </li>
+            <li id="timerange_1h">
+                Last 1 hour
+            </li>
+            <li id="timerange_3h">
+                Last 3 hour
+            </li>
+            <li id="timerange_6h">
+                Last 6 hour
+            </li>
+            <li id="timerange_12h">
+                Last 12 hour
+            </li>
+            <li id="timerange_1d">
+                Last 24 hour
+            </li>
+        </ul>
     </div>
 
     <div class="rows_container">
@@ -77,7 +99,10 @@
 
         <div class="chartconf_header"></div>
 
-        <div class="chartconf_chart"></div>
+        <div class="chartconf_chart_container">
+            <div class="chartconf_chart">
+            </div>
+        </div>
 
         <div class="chartconf_nav">
             <ul>
@@ -130,26 +155,26 @@
             <div class="chartconf_content_hidden", id="chartconf_visualization_container">
                 <ul>
                     <li>
-                        <span class="icon_btn_selected chart_vis" id="">
+                        <span class="icon_btn chart_vis" id="line_chart_btn">
                             <i class="fas fa-chart-line"></i>
                         </span>
-                        <span class="icon_btn chart_vis" id="">
+                        <span class="icon_btn chart_vis" id="pie_chart_btn">
                             <i class="fas fa-chart-pie"></i>
                         </span>
                     </li>
                     <li>
-                        <span class="icon_btn chart_vis" id="">
+                        <span class="icon_btn chart_vis" id="area_chart_btn">
                             <i class="fas fa-chart-area"></i>
                         </span>
-                        <span class="icon_btn chart_vis" id="">
+                        <span class="icon_btn chart_vis" id="heatmap_chart_btn">
                             <i class="fas fa-table"></i>
                         </span>
                     </li>
                     <li>
-                        <span class="icon_btn chart_vis" id="">
+                        <span class="icon_btn chart_vis" id="column_chart_btn">
                             <i class="fas fa-chart-bar"></i>
                         </span>
-                        <span class="icon_btn chart_vis" id="">
+                        <span class="icon_btn chart_vis" id="donut_chart_btn">
                             <i class="far fa-life-ring"></i>
                         </span>
                     </li>
@@ -157,6 +182,10 @@
             </div>
 
             <div class="chartconf_content_hidden", id="chartconf_axes_container">
+                <div>
+                    <span>xaxis units: </span>
+                    <input id="xaxis_units" type="text">
+                </div>
             </div>
 
             <div class="chartconf_content_hidden", id="chartconf_display_container">
@@ -169,12 +198,26 @@
 
 {% block scripts %}
     <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chartconf.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
     <script>
+        $(document).ready(function(){
+
+            // Set cache = false for all jquery ajax requests.
+            $.ajaxSetup({
+                cache: false,
+            });
+
+        });
+
         const dashboard_id = "{{ dashboard.id }}";
+        var g_timerange = "{{ dashboard.timerange }}";
         var g_rows_conf = {};
         var g_current_chart_id = null;
+        var g_apex_charts = {};
+        var g_current_view = "dashboard";
         $( function() {
             $(".rows_container").sortable();
         })
@@ -197,6 +240,7 @@
                 data: {
                     dashboard_id: dashboard_id,
                     rows_conf: JSON.stringify(g_rows_conf),
+                    timerange: window.g_timerange,
                 },
                 success: function (rows_conf) {
                     alert("yeah");
@@ -217,6 +261,7 @@
                 success: function (rows_conf) {
                     g_rows_conf = rows_conf;
                     draw_rows(rows_conf);
+                    actualize_charts();
                 },
                 error: function (e) {
                     alert("error");
@@ -358,71 +403,6 @@
             return row;
         }
         
-        function actualize_g_rows_conf() {
-            rows = document.querySelectorAll(".row");
-            charts = {};
-
-            for (var row_id in g_rows_conf) {
-                var row_charts = g_rows_conf[row_id].charts;
-                for (var chart_id in row_charts) {
-                    charts[chart_id] = row_charts[chart_id];
-                }
-            }
-
-            new_g_rows_conf = {};
-            var position = 0
-            rows.forEach((row) => {
-
-                row_conf = g_rows_conf[row.id];
-                row_conf.position = position;
-                row_conf.charts = get_row_charts(row.id, charts);
-                new_g_rows_conf[row.id] = row_conf;
-                position += 1;
-
-            });
-            g_rows_conf = new_g_rows_conf;
-        }
-
-        function actualize_g_chart_conf(chart_conf) {
-            g_rows_conf[chart_conf.row_id].charts[chart_conf.id] = chart_conf;
-        }
-
-        function get_chart_conf_by_id(wanted_chart_id) {
-            actualize_g_rows_conf();
-            rows = document.querySelectorAll(".row");
-            charts = {};
-
-            for (var row_id in g_rows_conf) {
-                row_conf = g_rows_conf[row_id];
-                for(var chart_id in row_conf.charts) {
-                    if (chart_id = wanted_chart_id) {
-                        return row_conf.charts[chart_id]
-                    }
-                }
-            }
-
-            alert("Cannot get chart conf by id");
-        }
-
-        function get_current_chart_conf() {
-            return get_chart_conf_by_id(g_current_chart_id);
-        }
-
-        function get_row_charts(row_id, charts) {
-            current_charts = document.querySelectorAll('#' + row_id + ' .chart');
-            charts_conf = {}
-
-            var position = 0
-            current_charts.forEach((chart) => {
-                chart_conf = charts[chart.id];
-                chart_conf.position = position;
-                chart_conf.row_id = row_id;
-                charts_conf[chart.id] = chart_conf
-                position += 1;
-            })
-            return charts_conf
-        }
-
         function delete_row(row_id) {
             actualize_g_rows_conf();
             delete g_rows_conf[row_id];
@@ -455,62 +435,326 @@
             return i;
         }
 
-        function get_default_options(type) {
-            if (type = "line") {
-                options = {
-                    "curve": "straight",
-                    "lineWidth": 5,
-                    "type": "line",
-                    "stacked": false,
-                    "legend": false,
-                    "units": 'numeric'
-                }
-            } else if (type = "column") {
-                options = {
-                    "curve": "straight",
-                    "lineWidth": 5,
-                    "type": "line",
-                    "stacked": false,
-                    "legend": false,
-                    "units": 'numeric'
-                }
-            } else if (type = "column") {
-                options = {
-                    "type": "column",
-                    "stacked": false,
-                    "legend": false,
-                    "units": 'numeric'
-                }
-            } else if (type = "area") {
-                options = {
-                    "curve": "straight",
-                    "lineWidth": 5,
-                    "type": "line",
-                    "stacked": false,
-                    "legend": false,
-                    "units": 'numeric',
-                    "fill" : {
-                        "type": 'solid'
+        function actualize_charts() {
+            for (var row_id in g_rows_conf) {
+                var row_charts = g_rows_conf[row_id].charts;
+                for (var chart_id in row_charts) {
+                    var chart_conf = row_charts[chart_id];
+                    var qstring = "#" + chart_conf.id + " .chart_chart";
+
+                    if (qstring in g_apex_charts) {
+                        g_apex_charts[qstring].destroy();
+                        delete g_apex_charts[qstring];
                     }
                 }
-            } else if (type = "pie") {
-                options = {
-                    "legend": false,
-                }
-            } else if (type = "donut") {
-                options = {
-                    "legend": false
-                }
-            } 
-        }
-
-        function fill_charts() {
+            }
             for (var row_id in g_rows_conf) {
-                charts = g_rows_conf[row_id].charts;
-                for (var chart_id in charts) {
-                    var chart_conf = charts[chart_id]
+                var row_charts = g_rows_conf[row_id].charts;
+                for (var chart_id in row_charts) {
+                    var chart_conf = row_charts[chart_id];
+                    var qstring = "#" + chart_conf.id + " .chart_chart";
+                    actualize_chart(qstring, chart_conf);
                 }
             }
+        }
+
+        function actualize_chart(qstring, chart_conf) {
+            var time_range = get_time_range()
+
+            if (!chart_conf.prom_query) {
+                console.log("chart: " + chart_conf.id + " doesnt have query");
+                return;
+            }
+
+            var request_conf = {
+                "prom_query": chart_conf.prom_query,
+                "instant": chart_conf.instant,
+                "step": chart_conf.step,
+                "start": time_range[0],
+                "end": time_range[1],
+            }
+        
+            $.ajax({
+                cache: false,
+                type: "GET",
+                url: "/api/prometheusRequest",
+                data: {
+                    request_conf: JSON.stringify(request_conf)
+                },
+                success: function (response) {
+                    if (response.status === "ok") {
+                        fill_chart(qstring, chart_conf, response.data);    
+                    }
+                },
+                error: function (e) {
+                    alert("prom query error");
+                },
+            });
+        }
+
+        function get_common_params() {
+            chart_params = {
+                // stroke: {},
+                chart: {
+                    animations: { enabled: false},
+                    redrawOnParentResize: true,
+                    width: '100%',
+                    height: '100%',
+                    toolbar: {
+                        show: false,
+                        offsetx: 0,
+                        offsety: 0,
+                        tools: {
+                            download: false,
+                            selection: false,
+                            zoom: false,
+                            zoomin: false,
+                            zoomout: false,
+                            pan: false,
+                            reset: false,
+                            customicons: []
+                        },
+                        autoselected: 'zoom' 
+                    },
+                },
+                // legend: {},
+                dataLabels: {
+                    enabled: false
+                },
+                // series: [],
+                // labels: [],
+                // xaxis: {},
+                // tooltip: {
+                //     enabled: false
+                // },
+                grid: {
+                    show: false
+                },
+            }
+            return chart_params;
+        }
+
+        function correct_units(units, values) {
+            
+            switch(units) {
+                case "numeric":
+                    break;
+                case "datetime":
+                    for (let i = 0; i < values.length; i++) {
+                        values[i][0] *= 1000;
+                    } 
+                    break;
+                default:
+                    alert("Unknown units: " + units
+                                            + ". Return default values");
+            }
+
+            return values;
+        } 
+
+        function fill_chart(qstring, chart_conf, prom_data) {
+            var chart_type = chart_conf.visualization.type;
+            var chart_options = chart_conf.visualization.options;
+            var chart_params = get_chart_params(chart_conf);
+
+            // TODO show err icon in graph
+            if (prom_data.status != "success") {
+                alert("prom query err");
+                return;
+            }
+
+            var data = prom_data.data;
+            switch(chart_type) {
+                case "line": case "column":
+                    if (data.resultType !== "matrix") {
+                        alert("bad data format");
+                    }
+
+                    var series = []
+                    data.result.forEach((result) => {
+                        correct_units(chart_params.xaxis.type, result.values);
+                        var serie = {
+                            type: chart_type,
+                            data: result.values
+                        }
+                        series.push(serie);
+                    })
+                    chart_params.series = series;
+                    break;
+                case "area":
+                    if (data.resultType !== "matrix") {
+                        alert("bad data format");
+                    }
+
+                    var series = []
+                    data.result.forEach((result) => {
+                        correct_units(chart_params.xaxis.type, result.values);
+                        var serie = {
+                            data: result.values
+                        }
+                        series.push(serie);
+                    })
+                    chart_params.series = series;
+                    break;
+                case "pie": case "donut":
+                    if (data.resultType != "vector") {
+                        alert("bad data format");
+                    }
+
+                    var series = []
+
+                    data.result.forEach((result) => {
+                        series.push(parseFloat(result.value[1]));
+                    });
+
+                    chart_params.series = series;
+                    break;
+                case "heatmap":
+                    if (data.resultType !== "matrix") {
+                        alert("bad data format");
+                    }
+
+                    var series = []
+                    data.result.forEach((result) => {
+                        correct_units(chart_params.xaxis.type, result.values);
+                        var serie = {
+                            data: result.values
+                        }
+                        series.push(serie);
+                    })
+                    chart_params.series = series;
+                    break;
+                default:
+                    alert("fill_chart Unknown chart type: " + chart_type);
+            }
+
+            if (!(qstring in g_apex_charts)) {
+                console.log("Creating new chart");
+                var chart = new ApexCharts(
+                        document.querySelector(qstring), chart_params);
+                g_apex_charts[qstring] = chart;
+                chart.render();
+            } else {
+                alert(qstring + "should not be in g_apex_charts");
+            }
+        }
+
+        function get_chart_params(chart_conf) {
+            var chart_type = chart_conf.visualization.type;
+            var chart_options = chart_conf.visualization.options;
+            var chart_params = get_common_params();
+
+            switch(chart_type) {
+                case "line": case "column":
+                    var stroke = {
+                        curve: chart_options.curve,
+                        width: chart_options.lineWidth
+                    };
+                    var legend = {
+                        show: chart_options.legend,
+                    };
+                    var xaxis = {
+                        type: chart_options.units
+                    };
+
+                    chart_params.stroke = stroke;
+                    chart_params.legend = legend;
+                    chart_params.xaxis = xaxis;
+                    chart_params.chart.stacked = chart_options.stacked;
+                    break;
+                case "area":
+                    var stroke = {
+                        curve: chart_options.curve,
+                        width: chart_options.lineWidth
+                    };
+                    var legend = {
+                        show: chart_options.legend,
+                    };
+                    var xaxis = {
+                        type: chart_options.units
+                    };
+                    fill = chart_options.fill;
+
+                    chart_params.stroke = stroke;
+                    chart_params.legend = legend;
+                    chart_params.xaxis = xaxis;
+                    chart_params.chart.stacked = chart_options.stacked;
+                    chart_params.chart.type = chart_type
+                    break;
+                case "pie": case "donut":
+                    var legend = {
+                        show: chart_options.legend,
+                    };
+                    chart_params.legend = legend;
+                    chart_params.chart.type = chart_type
+                    break;
+                case "heatmap":
+                    console.log("chart_options: ");
+                    console.log(chart_options);
+                    var legend = {
+                        show: chart_options.legend,
+                    };
+                    var xaxis = {
+                        type: chart_options.units
+                    };
+                    chart_params.colors = chart_options.colors;
+                    chart_params.xaxis = xaxis;
+                    chart_params.chart.type = chart_type;
+                    console.log("chart_params: ");
+                    console.log(chart_params);
+                    break;
+                default:
+                    alert("get_chart_params Unknown chart type: " + chart_type);
+            } 
+            // TODO others
+
+            return chart_params;
+        }
+
+        function get_default_options(type) {
+            var options = null;
+
+            switch(type) {
+                case "line": case "column":
+                    options = {
+                        "curve": "straight",
+                        "lineWidth": 5,
+                        "type": "line",
+                        "stacked": false,
+                        "legend": false,
+                        "units": 'numeric'
+                    }
+                    break;
+                case "area":
+                    options = {
+                        "curve": "straight",
+                        "lineWidth": 5,
+                        "type": "line",
+                        "stacked": false,
+                        "legend": false,
+                        "units": 'numeric',
+                        "fill" : {
+                            "type": 'solid'
+                        }
+                    }
+                    break;
+                case "pie": case "donut":
+                    options = {
+                        "legend": false,
+                    }
+                    break;
+                case "heatmap":
+                    options = {
+                        "legend": false,
+                        "colors": ["#008FFB"],
+                        "units": 'datetime'
+                    }
+                    break;
+                default:
+                    alert("Unknown chart type");
+            }
+
+            return options;
         }
 
         function get_new_chart(row_id) {
@@ -542,12 +786,14 @@
         function get_chart(chart_conf) {
             var chart = document.createElement('div');
             var chart_nav = document.createElement('div');
+            var chart_chart = document.createElement('div');
             var chart_name = document.createElement('span');
             var chart_icon = document.createElement('span');
             var chart_icon_i = document.createElement('i');
 
             chart.classList.add('chart');
             chart_nav.classList.add('chart_nav');
+            chart_chart.classList.add('chart_chart');
             chart_name.classList.add('chart_name');
             chart_icon.classList.add('icon_btn');
             chart_icon_i.classList.add('fas');
@@ -556,10 +802,8 @@
             chart.id = chart_conf.id;
             chart_name.textContent = chart_conf.name;
 
-            console.log(chart_conf);
-
             for (var style in chart_conf.style) {
-                value = chart_conf.style[style];
+                var value = chart_conf.style[style];
                 if (value) {
                     chart.style[style] = value;
                 }
@@ -567,6 +811,7 @@
             chart_icon.addEventListener("click", () => {
                 chart_conf = get_chart_conf_by_id(chart_conf.id)
                 g_current_chart_id = chart_conf.id
+                g_current_view = "chartconf";
                 show_chart_settings(chart_conf);
             });
 
@@ -574,6 +819,7 @@
             chart_nav.appendChild(chart_name);
             chart_nav.appendChild(chart_icon);
             chart.appendChild(chart_nav)
+            chart.appendChild(chart_chart)
 
             return chart;
         }
@@ -584,11 +830,20 @@
             charts_container.insertBefore(chart_elem, charts_container.firstChild);
         }
 
-        // TODO
-        function updateDashboard() {
-        }
-
         init_charts();
+
+        var back_btn = document.getElementById("back_btn");
+        back_btn.addEventListener("click", () => {
+            switch (g_current_view) {
+                case "chartconf":
+                    hide_chart_settings();
+                    g_current_view = "dashboard";
+                    update_charts();
+                    break;
+                default:
+                    alert("wrong g_current_view: " + g_current_view);
+            }
+        });
 
     </script>
 {% endblock %}

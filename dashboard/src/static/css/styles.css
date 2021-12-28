@@ -203,6 +203,10 @@ nav a {
     margin-top: 10px;
 }
 
+.chart_nav {
+    height: 10%;
+}
+
 .chart_name {
     color: var(--nav-fg);
 }
@@ -350,3 +354,26 @@ nav a {
     display: flex;
     flex-direction: column;
 }
+
+
+/* ??? */
+
+.chartconf_chart_container {
+    background-color: rgba(255, 0, 0, 0.171);
+    display: flex;
+    justify-content: center;
+}
+
+.chartconf_chart {
+    background-color: rgba(6, 2, 20, 0.342);
+
+}
+
+.timerange_container {
+    display: none;
+}
+
+.hidden {
+    display: none;
+}
+

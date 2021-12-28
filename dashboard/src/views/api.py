@@ -24,6 +24,10 @@ def getDatasource():
 
 @api.route("/prometheusRequest", methods=["GET"])
 def prometheusRequest():
+    response = {
+        "status": "err",
+        "data": None
+    }
     request_conf = json.loads(request.args.get('request_conf'))
     params = {
         "query": request_conf["prom_query"],
@@ -44,17 +48,29 @@ def prometheusRequest():
 
     datasource = Datasource.query.first()
     current_app.logger.info(f"datasource: {datasource}")
+
+    if not datasource:
+        response["status"] = "no datasource"
+        return make_response(response, 200)
+
+    if not datasource.url:
+        response["status"] = "no datasource url"
+        return make_response(response, 200)
+
     current_app.logger.info(f"datasource_url: {datasource.url}")
+
     prom_url = os.path.join(datasource.url, query_prefix)
     current_app.logger.info(f"prom_url: {prom_url}")
     # prom_url = 'http://localhost:9090/api/v1/query_range?query=errors_total&start=2021-12-22T16:05:36.111Z&end=2021-12-23T11:16:05.111Z&step=1m'
-    response = requests.get(prom_url, params=params)
-    current_app.logger.info(f"response.text: {response.text}")
+    prom_response = requests.get(prom_url, params=params)
+    current_app.logger.info(f"response.text: {prom_response.text}")
 
-    if response.status_code != 200:
-        make_response("", response.status_code)
+    if prom_response.status_code != 200:
+        return make_response("Bad query", prom_response.status_code)
 
-    return make_response(jsonify(response.json()), 200)
+    response["status"] = "ok"
+    response["data"] = prom_response.json()
+    return make_response(response, 200)
 
 
 @api.route("/updateDatasource", methods=["POST"])
@@ -80,10 +96,15 @@ def updateDatasource():
 def saveDashboard():
     dashboard_id = request.form.get('dashboard_id')
     rows_conf = json.loads(request.form.get('rows_conf'))
+    timerange = request.form.get('timerange')
 
     dashboard = Dashboard.query.get(dashboard_id)
     if not dashboard:
         return make_response("Not found\n", 404)
+
+    if not timerange:
+        return make_response("Bad request\n", 400)
+    dashboard.timerange = timerange
 
     rows = Row.query.filter_by(dashboard_id=dashboard.id)
     for row in rows:

@@ -1,13 +1,3 @@
-// TODO
-function hideChartSettings() {
-    alert("You have to implement hideChartSettings");
-}
-
-// TODO
-function showChartSettings() {
-    alert("You have to implement showChartSettings");
-}
-
 function init_dashboard() {
     // enable user to move rows
     $( function() {
@@ -25,13 +15,6 @@ function init_dashboard() {
     saveBtn.addEventListener("click", () => {
         window.dashboard.save();
     }); 
-
-    // back to dashboard button
-    var backBtn = document.getElementById("back_btn");
-    backBtn.addEventListener("click", () => {
-        hideChartSettings();
-        window.dashboard.currentView = "dashboard";
-    });
 
     // get dashboard rows and chart and render them
     window.dashboard.init();

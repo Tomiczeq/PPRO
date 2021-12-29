@@ -28,9 +28,9 @@ def prometheusRequest():
         "status": "err",
         "data": None
     }
-    request_conf = json.loads(request.args.get('request_conf'))
+    request_conf = json.loads(request.args.get('requestConf'))
     params = {
-        "query": request_conf["prom_query"],
+        "query": request_conf["promQuery"],
     }
 
     if request_conf["instant"]:

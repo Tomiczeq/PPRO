@@ -14,7 +14,6 @@ function getRowHtml(row) {
         showBtn.style.display = "none";
         hideBtn.style.display = "";
         chartsContainer.style.display = "";
-        
     });
     hideBtn.addEventListener("click", () => {
         showBtn.style.display = "";
@@ -79,7 +78,8 @@ function getChartHtml(chart) {
     }
     chartIcon.addEventListener("click", () => {
         window.dashboard.currentView = "chartconf";
-        window.dashboard.curentChart = chart;
+        window.dashboard.currentChartId = chart.id;
+        window.dashboard.currentRowId = chart.rowId;
         showChartSettings(chart)
     });
 
@@ -215,4 +215,280 @@ function getDefaultName(identifier, substring) {
         }
     }
     return searched;
+}
+
+function getCommonParams() {
+    chartParams = {
+        chart: {
+            animations: { enabled: false},
+            redrawOnParentResize: true,
+            width: '100%',
+            height: '100%',
+            toolbar: {
+                show: false,
+                offsetx: 0,
+                offsety: 0,
+                tools: {
+                    download: false,
+                    selection: false,
+                    zoom: false,
+                    zoomin: false,
+                    zoomout: false,
+                    pan: false,
+                    reset: false,
+                    customicons: []
+                },
+                autoselected: 'zoom' 
+            },
+        },
+        dataLabels: {
+            enabled: false
+        },
+        // tooltip: {
+        //     enabled: false
+        // },
+        grid: {
+            show: false
+        },
+    }
+    return chartParams;
+}
+
+function getChartParams(chart, promData) {
+    var chartType = chart.visualization.type;
+    var chartOptions = chart.visualization.options;
+    console.log("chart.visualization");
+    console.log(chart.visualization);
+    var chartParams = getCommonParams();
+
+    var chartLegend = chartOptions.legend.trim();
+    var showLegend = false;
+
+    if (chartLegend) {
+        showLegend = true;
+    }
+
+    switch(chartType) {
+        case "line": case "column":
+            var stroke = {
+                curve: chartOptions.curve,
+                width: chartOptions.lineWidth
+            };
+
+            var legend = {
+                show: showLegend,
+            };
+            var xaxis = {
+                type: chartOptions.units
+            };
+
+            chartParams.stroke = stroke;
+            chartParams.legend = legend;
+            chartParams.xaxis = xaxis;
+            chartParams.chart.stacked = chartOptions.stacked;
+            break;
+        case "area":
+            var stroke = {
+                curve: chartOptions.curve,
+                width: chartOptions.lineWidth
+            };
+            var legend = {
+                show: showLegend,
+            };
+            var xaxis = {
+                type: chartOptions.units
+            };
+            fill = chartOptions.fill;
+
+            chartParams.stroke = stroke;
+            chartParams.legend = legend;
+            chartParams.xaxis = xaxis;
+            chartParams.chart.stacked = chartOptions.stacked;
+            chartParams.chart.type = chartType
+            break;
+        case "pie": case "donut":
+            var legend = {
+                show: showLegend,
+            };
+            chartParams.legend = legend;
+            chartParams.chart.type = chartType
+            break;
+        case "heatmap":
+            var legend = {
+                show: showLegend,
+            };
+            var xaxis = {
+                type: chartOptions.units
+            };
+            chartParams.legend = legend;
+            chartParams.colors = chartOptions.colors;
+            chartParams.xaxis = xaxis;
+            chartParams.chart.type = chartType;
+            break;
+        default:
+            // TODO
+            alert("get_chartParams Unknown chart type: " + chartType);
+    } 
+    fillData(chartType, chartOptions, chartParams, promData);
+    return chartParams;
+}
+
+function correct_units(units, values) {
+    
+    switch(units) {
+        case "numeric":
+            break;
+        case "datetime":
+            for (let i = 0; i < values.length; i++) {
+                values[i][0] *= 1000;
+            } 
+            break;
+        default:
+            alert("Unknown units: " + units
+                                    + ". Return default values");
+    }
+
+    return values;
+} 
+
+function fillData(chartType, chartOptions, chartParams, promData) {
+    if (promData.status != "success") {
+        // TODO
+        alert("prom query err");
+        return;
+    }
+
+    var data = promData.data;
+    switch(chartType) {
+        case "line": case "column":
+            if (data.resultType !== "matrix") {
+                // TODO
+                alert("bad data format");
+            }
+
+            var series = []
+            data.result.forEach((result) => {
+                correct_units(chartParams.xaxis.type, result.values);
+                var serie = {
+                    type: chartType,
+                    data: result.values
+                }
+                if (chartParams.legend.show) {
+                    var legend_name = chartOptions.legend.trim();
+                    if (!legend_name) {
+                        // TODO
+                        alert("legend name should not be empty");
+                    }
+
+                    if (legend_name in result.metric) {
+                        var legend_value = result.metric[legend_name];
+                        serie.name = legend_value;
+                    } else {
+                        // TODO
+                        alert("legend_name not found in data");
+                    }
+                }
+                series.push(serie);
+            })
+            chartParams.series = series;
+            break;
+        case "area":
+            if (data.resultType !== "matrix") {
+                // TODO
+                alert("bad data format");
+            }
+
+            var series = []
+            data.result.forEach((result) => {
+                correct_units(chartParams.xaxis.type, result.values);
+                var serie = {
+                    data: result.values
+                }
+                if (chartParams.legend.show) {
+                    var legend_name = chartOptions.legend.trim();
+                    if (!legend_name) {
+                        // TODO
+                        alert("legend name should not be empty");
+                    }
+
+                    if (legend_name in result.metric) {
+                        var legend_value = result.metric[legend_name];
+                        serie.name = legend_value;
+                    } else {
+                        // TODO
+                        alert("legend_name not found in data");
+                    }
+                }
+                series.push(serie);
+            })
+            chartParams.series = series;
+            break;
+        case "pie": case "donut":
+            if (data.resultType != "vector") {
+                // TODO
+                alert("bad data format");
+            }
+
+            var series = []
+            var labels = []
+
+            data.result.forEach((result) => {
+                series.push(parseFloat(result.value[1]));
+                if (chartParams.legend.show) {
+                    var legend_name = chartOptions.legend.trim();
+                    if (!legend_name) {
+                        // TODO
+                        alert("legend name should not be empty");
+                    }
+
+                    if (legend_name in result.metric) {
+                        var legend_value = result.metric[legend_name];
+                        labels.push(legend_value);
+                    } else {
+                        // TODO
+                        alert("legend_name not found in data");
+                    }
+            }
+
+            });
+
+            chartParams.series = series;
+            chartParams.labels = labels;
+            break;
+        case "heatmap":
+            if (data.resultType !== "matrix") {
+                // TODO
+                alert("bad data format");
+            }
+
+            var series = []
+            data.result.forEach((result) => {
+                correct_units(chartParams.xaxis.type, result.values);
+                var serie = {
+                    data: result.values
+                }
+                if (chartParams.legend.show) {
+                    var legend_name = chartOptions.legend.trim();
+                    if (!legend_name) {
+                        // TODO
+                        alert("legend name should not be empty");
+                    }
+
+                    if (legend_name in result.metric) {
+                        var legend_value = result.metric[legend_name];
+                        console.log("legend_value: " + legend_value);
+                        serie.name = legend_value;
+                    } else {
+                        // TODO
+                        alert("legend_name not found in data");
+                    }
+                }
+                series.push(serie);
+            })
+            chartParams.series = series;
+            break;
+        default:
+            // TODO
+            alert("fill_chart Unknown chart type: " + chartType);
+    }
 }

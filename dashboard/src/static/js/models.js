@@ -1,9 +1,17 @@
+// apexCharts in Chart cause TypeError: cyclic object value
+function replacer(key,value) {
+    if (key==="apexChart") return undefined;
+    else return value;
+}
+
 class Dashboard {
     constructor(id, name) {
         this.id = id;
         this.name = name;
         this.timerange = "3h";
         this.currentView = "dashboard";
+        this.currentRowId = null;
+        this.currentChartId = null;
         this.rows = {};
         this.rowsByPos = [];
     }
@@ -33,7 +41,7 @@ class Dashboard {
             type: "POST",
             url: "/api/saveDashboard",
             data: {
-                dashboard: JSON.stringify(this),
+                dashboard: JSON.stringify(this, replacer),
             },
             success: (response) => {
                 this.showSaveSucces();
@@ -72,10 +80,6 @@ class Dashboard {
         for (var rowId in this.rows) {
             this.rows[rowId].updateCharts();
         }
-    }
-
-    static updateChart(qstring, chart) {
-
     }
 
     addNewRow() {
@@ -133,6 +137,13 @@ class Dashboard {
             });
             row.actualizeChartsPosition();
         }
+    }
+
+    getCurrentChart() {
+        if (!(this.currentChartId && this.currentRowId)) {
+            return null;
+        }
+        return this.rows[this.currentRowId].charts[this.currentChartId];
     }
 
     // TODO
@@ -248,16 +259,21 @@ class Chart {
             "min_height": null,
             "max_height": null,
         };
-        this.visualization = getDefaultOptions("line");
+        this.visualization = {
+            "type": "line",
+            "options": getDefaultOptions("line")
+        };
         this.apexChart = null;
         this.qstring = "#" + id + " .chart_chart";
+        this.chartConfQstring = ".chartconf_chart";
     }
 
     static fromConf(chartConf) {
         var newChart = new Chart(
             chartConf.id, chartConf.name, chartConf.rowId, chartConf.position);
         newChart.promQuery = chartConf.promQuery;
-        newChart.instant = chartConf.Instant;
+        newChart.instant = chartConf.instant;
+        console.log("newChart instant: " + newChart.instant);
         newChart.step = chartConf.step;
         newChart.style = chartConf.style;
         newChart.visualization = chartConf.visualization;
@@ -269,11 +285,22 @@ class Chart {
     }
 
     update() {
+        // need to delete rendered apexchart, because apexChart updateOptions
+        // merge old options with new options. This cause problems, because
+        // old options are not removed.
+        if (this.apexChart) {
+            this.apexChart.destroy();
+            delete this.apexChart;
+            this.apexChart = null;
+        } 
+
         if (!this.promQuery.trim()) {
             return;
         }
 
         var timeRange = getTimerange();
+        console.log("instant: " + this.instant);
+        console.log("promQuery: " + this.promQuery);
         var requestConf = {
             "promQuery": this.promQuery,
             "instant": this.instant,
@@ -288,32 +315,33 @@ class Chart {
             data: {
                 requestConf: JSON.stringify(requestConf)
             },
-            success: function (response) {
+            success: (response) => {
                 if (response.status === "ok") {
-                    fill(response.data);
+                    this.fill(response.data);
                 } else {
                     this.showError("chart update error");
                 }
             },
-            error: function (e) {
+            error: (e) => {
                 this.showError("chart update error 2");
             },
         });
     }
 
     fill(data) {
-        // need to delete rendered apexchart, because apexChart updateOptions
-        // merge old options with new options. This cause problems, because
-        // old options are not removed.
-        if (this.apexChart) {
-            this.apexChart.destroy();
-            delete this.apexChart;
-        } 
-
         var chartParams = getChartParams(this, data);
+        var qstring = this.getQstring();
         this.apexChart = new ApexCharts(
-                document.querySelector(this.qstring), chartParams);
+                document.querySelector(qstring), chartParams);
+        console.log("rendering chart");
         this.apexChart.render();
+    }
+
+    getQstring() {
+        if (window.dashboard.currentView === "chartconf") {
+            return this.chartConfQstring;
+        }
+        return this.qstring;
     }
 
     // TODO

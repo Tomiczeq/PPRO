@@ -577,6 +577,19 @@
                             type: chart_type,
                             data: result.values
                         }
+                        if (chart_params.legend.show) {
+                            var legend_name = chart_options.legend.trim();
+                            if (!legend_name) {
+                                alert("legend name should not be empty");
+                            }
+
+                            if (legend_name in result.metric) {
+                                var legend_value = result.metric[legend_name];
+                                serie.name = legend_value;
+                            } else {
+                                alert("legend_name not found in data");
+                            }
+                        }
                         series.push(serie);
                     })
                     chart_params.series = series;
@@ -592,6 +605,19 @@
                         var serie = {
                             data: result.values
                         }
+                        if (chart_params.legend.show) {
+                            var legend_name = chart_options.legend.trim();
+                            if (!legend_name) {
+                                alert("legend name should not be empty");
+                            }
+
+                            if (legend_name in result.metric) {
+                                var legend_value = result.metric[legend_name];
+                                serie.name = legend_value;
+                            } else {
+                                alert("legend_name not found in data");
+                            }
+                        }
                         series.push(serie);
                     })
                     chart_params.series = series;
@@ -602,12 +628,28 @@
                     }
 
                     var series = []
+                    var labels = []
 
                     data.result.forEach((result) => {
                         series.push(parseFloat(result.value[1]));
+                        if (chart_params.legend.show) {
+                            var legend_name = chart_options.legend.trim();
+                            if (!legend_name) {
+                                alert("legend name should not be empty");
+                            }
+
+                            if (legend_name in result.metric) {
+                                var legend_value = result.metric[legend_name];
+                                labels.push(legend_value);
+                            } else {
+                                alert("legend_name not found in data");
+                            }
+                    }
+
                     });
 
                     chart_params.series = series;
+                    chart_params.labels = labels;
                     break;
                 case "heatmap":
                     if (data.resultType !== "matrix") {
@@ -619,6 +661,20 @@
                         correct_units(chart_params.xaxis.type, result.values);
                         var serie = {
                             data: result.values
+                        }
+                        if (chart_params.legend.show) {
+                            var legend_name = chart_options.legend.trim();
+                            if (!legend_name) {
+                                alert("legend name should not be empty");
+                            }
+
+                            if (legend_name in result.metric) {
+                                var legend_value = result.metric[legend_name];
+                                console.log("legend_value: " + legend_value);
+                                serie.name = legend_value;
+                            } else {
+                                alert("legend_name not found in data");
+                            }
                         }
                         series.push(serie);
                     })
@@ -644,14 +700,23 @@
             var chart_options = chart_conf.visualization.options;
             var chart_params = get_common_params();
 
+            console.log("chart_options.legend: " + chart_options.legend);
+            var chart_legend = chart_options.legend.trim();
+            var show_legend = false;
+
+            if (chart_legend) {
+                show_legend = true;
+            }
+
             switch(chart_type) {
                 case "line": case "column":
                     var stroke = {
                         curve: chart_options.curve,
                         width: chart_options.lineWidth
                     };
+
                     var legend = {
-                        show: chart_options.legend,
+                        show: show_legend,
                     };
                     var xaxis = {
                         type: chart_options.units
@@ -668,7 +733,7 @@
                         width: chart_options.lineWidth
                     };
                     var legend = {
-                        show: chart_options.legend,
+                        show: show_legend,
                     };
                     var xaxis = {
                         type: chart_options.units
@@ -683,7 +748,7 @@
                     break;
                 case "pie": case "donut":
                     var legend = {
-                        show: chart_options.legend,
+                        show: show_legend,
                     };
                     chart_params.legend = legend;
                     chart_params.chart.type = chart_type
@@ -692,11 +757,12 @@
                     console.log("chart_options: ");
                     console.log(chart_options);
                     var legend = {
-                        show: chart_options.legend,
+                        show: show_legend,
                     };
                     var xaxis = {
                         type: chart_options.units
                     };
+                    chart_params.legend = legend;
                     chart_params.colors = chart_options.colors;
                     chart_params.xaxis = xaxis;
                     chart_params.chart.type = chart_type;
@@ -721,7 +787,7 @@
                         "lineWidth": 5,
                         "type": "line",
                         "stacked": false,
-                        "legend": false,
+                        "legend": "",
                         "units": 'numeric'
                     }
                     break;
@@ -731,7 +797,7 @@
                         "lineWidth": 5,
                         "type": "line",
                         "stacked": false,
-                        "legend": false,
+                        "legend": "",
                         "units": 'numeric',
                         "fill" : {
                             "type": 'solid'
@@ -740,12 +806,12 @@
                     break;
                 case "pie": case "donut":
                     options = {
-                        "legend": false,
+                        "legend": "",
                     }
                     break;
                 case "heatmap":
                     options = {
-                        "legend": false,
+                        "legend": "",
                         "colors": ["#008FFB"],
                         "units": 'datetime'
                     }

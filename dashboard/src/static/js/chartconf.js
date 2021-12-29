@@ -158,7 +158,7 @@ function init() {
             var legend = query_legend.value;
 
             chart_conf = get_current_chart_conf();
-            chart_conf.legend = legend;
+            chart_conf.visualization.options.legend = legend;
             actualize_g_chart_conf(chart_conf);
             update_charts();
         }

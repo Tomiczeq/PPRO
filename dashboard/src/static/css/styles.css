@@ -184,6 +184,7 @@ nav a {
 
 .charts_container {
     display: flex;
+    min-height: 20px;
 }
 
 .chart {

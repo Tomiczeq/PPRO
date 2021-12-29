@@ -50,30 +50,6 @@ function show_chart_settings(chart_conf) {
     xaxis_units.value = chart_conf.visualization.options.units;
 }
 
-function get_prom_data(chart_conf) {
-    var time_range = get_time_range()
-    var request_conf = {
-        "prom_query": chart_conf.prom_query,
-        "instant": chart_conf.instant,
-        "step": chart_conf.step,
-        "start": time_range[0],
-        "end": time_range[1],
-    }
-
-    $.ajax({
-        type: "GET",
-        url: "/api/prometheusRequest",
-        data: {
-            request_conf: JSON.stringify(request_conf)
-        },
-        success: function (response) {
-        },
-        error: function (e) {
-            alert("prom query error");
-        },
-    });
-}
-
 function update_charts() {
     console.log("update_charts g_current_view: " + window.g_current_view);
     if (window.g_current_view === "chartconf") {

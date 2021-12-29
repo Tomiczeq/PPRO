@@ -34,9 +34,7 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         sentinel = Dashboard('sentinel')
-        nametag = Dashboard('nametag')
         db.session.add(sentinel)
-        db.session.add(nametag)
         db.session.commit()
 
     port = config.getint("server", "port", fallback=8080)

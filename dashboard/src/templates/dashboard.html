@@ -16,10 +16,6 @@
                 <span>last</span>
                 <input id="query_last" type="text" value="{{ dashboard.timerange }}">
             </span>
-
-            <span id="timerange_btn" class="icon_btn">
-                <i class="far fa-clock"></i>
-            </span>
             <span class="icon_btn" id="add_row_btn">
                 <i class="fas fa-plus"></i>
             </span>
@@ -32,67 +28,7 @@
         </div>
     </div>
 
-    <div class="timerange_container">
-        <ul>
-            <li id="timerange_5m">
-                Last 5 minutes
-            </li>
-            <li id="timerange_15m">
-                Last 15 minutes
-            </li>
-            <li id="timerange_30m">
-                Last 30 minutes
-            </li>
-            <li id="timerange_1h">
-                Last 1 hour
-            </li>
-            <li id="timerange_3h">
-                Last 3 hour
-            </li>
-            <li id="timerange_6h">
-                Last 6 hour
-            </li>
-            <li id="timerange_12h">
-                Last 12 hour
-            </li>
-            <li id="timerange_1d">
-                Last 24 hour
-            </li>
-        </ul>
-    </div>
-
     <div class="rows_container">
-        <!-- {% for row in rows|sort(attribute='position') %}
-            <div id="{{ row.id }}" class="row">
-                <div class="row_header">
-                    <span>{{ row.name }}</span>
-                    <span class="icon_btn">
-                        <i class="fas fa-chevron-right"></i>
-                    </span>
-                    <span class="icon_btn">
-                        <i class="fas fa-chevron-down"></i>
-                    </span>
-                    <span class="icon_btn">
-                        <i class="fas fa-plus"></i>
-                    </span>
-                    <span class="icon_btn">
-                        <i class="fas fa-trash"></i>
-                    </span>
-                </div>
-                <div class="charts_container">
-                    {% for chart in row.charts|sort(attribute='position') %}
-                        <div id="{{ chart.id }}" class="chart">
-                            <div class="chart_nav">
-                                <span class="chart_name">{{ chart.name }}</span>
-                                <a class="icon_btn", href="{{ url_for('dashboards.chart_page', chart_id=chart.id) }}">
-                                    <i class="fas fa-cog"></i>
-                                </a>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        {% endfor %} -->
     </div>
 
     <div class="chartconf_container">
@@ -198,18 +134,35 @@
 
 {% block scripts %}
     <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
-    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/chartconf.js') }}"></script>
+    <!-- <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chartconf.js') }}"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
+    
+    <!-- NEW -->
+    <script src="{{ url_for('static', filename='js/modelsUtils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/models.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
     <script>
         $(document).ready(function(){
-
             // Set cache = false for all jquery ajax requests.
             $.ajaxSetup({
                 cache: false,
             });
+        });
 
+        var dashboardId = "{{ dashboard.id }}";
+        var dashboardName = "{{ dashboard.name}} ";
+        var dashboard = new Dashboard(dashboardId, dashboardName);
+        init_dashboard();
+    </script>
+
+
+    <!-- <script>
+        $(document).ready(function(){
+            // Set cache = false for all jquery ajax requests.
+            $.ajaxSetup({
+                cache: false,
+            });
         });
 
         const dashboard_id = "{{ dashboard.id }}";
@@ -911,5 +864,5 @@
             }
         });
 
-    </script>
+    </script> -->
 {% endblock %}

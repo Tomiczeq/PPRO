@@ -22,14 +22,14 @@ class Dashboard(db.Model):
 
     def __init__(self, name):
         self.name = name
-        self.timerange = "1h"
+        self.timerange = "3h"
 
 
 class Row(db.Model):
     id = db.Column(db.String(30), primary_key=True)
     name = db.Column(db.String(30))
     position = db.Column(db.Integer)
-    dashboard_id = db.Column(
+    dashboardId = db.Column(
             db.Integer,
             db.ForeignKey('dashboard.id'),
             nullable=False
@@ -44,8 +44,7 @@ class Row(db.Model):
             "id": self.id,
             "name": self.name,
             "position": self.position,
-            "dashboard_id": self.dashboard_id,
-            "charts": [],
+            "dashboardId": self.dashboardId,
         }
         return dct
 
@@ -53,7 +52,7 @@ class Row(db.Model):
     def from_conf(conf):
         row = Row()
         for k, v in conf.items():
-            if k == "charts":
+            if k in ("charts", "chartsByPos"):
                 continue
             else:
                 setattr(row, k, v)
@@ -64,13 +63,12 @@ class Chart(db.Model):
     id = db.Column(db.String(30), primary_key=True)
     name = db.Column(db.String(30))
     position = db.Column(db.Integer)
-    prom_query = db.Column(db.String(1000))
-    legend = db.Column(db.String(30))
+    promQuery = db.Column(db.String(1000))
     step = db.Column(db.String(30))
     instant = db.Column(db.Boolean)
     visualization = db.Column(db.String(2000))
 
-    row_id = db.Column(
+    rowId = db.Column(
             db.String(30),
             db.ForeignKey('row.id'),
             nullable=False
@@ -92,10 +90,9 @@ class Chart(db.Model):
             "id": self.id,
             "name": self.name,
             "position": self.position,
-            "row_id": self.row_id,
-            "prom_query": self.prom_query,
+            "rowId": self.rowId,
+            "promQuery": self.promQuery,
             "step": self.step,
-            "legend": self.legend,
             "instant": self.instant,
             "visualization": json.loads(self.visualization),
             "style": {
@@ -113,7 +110,9 @@ class Chart(db.Model):
     def from_conf(conf):
         chart = Chart()
         for k, v in conf.items():
-            if k == "style":
+            if k in ("apexChart", "qstring"):
+                continue
+            elif k == "style":
                 for kk, vv in v.items():
                     setattr(chart, kk, vv)
             elif k == "visualization":

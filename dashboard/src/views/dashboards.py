@@ -23,4 +23,5 @@ def dashboardPage(name):
 @dashboards.route("/", methods=["GET"])
 @login_required
 def homePage():
-    return render_template("home.html")
+    dashboards = Dashboard.query.all()
+    return render_template("home.html", dashboards=dashboards)

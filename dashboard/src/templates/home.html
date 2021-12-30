@@ -4,12 +4,79 @@
 <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/colors.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+    <script src="https://kit.fontawesome.com/d8730202bf.js"></script>
 </head>
 
 <body>
 
-    Helloe
+    <nav>
+        <div class="bar">
+            <div class="searchBar">
+                <span>
+                    <input id="searchText" type="text">
+                </span>
+                <span id="searchDashboardBtn" class="button searchBarIcon">
+                    <i class="fas fa-search"></i>
+                </span>
+                <span id="stopSearchBtn" class="button searchBarIcon">
+                    <i class="fas fa-times"></i>
+                </span>
+            </div>
+            <div class="createDashboard">
+                <span id="createDashboardBtn" class="button createBarIcon">
+                    <i class="fas fa-plus"></i>
+                </span>
+            </div>
+        </div>
+    </nav>
 
+    <div class="searchContent">
+        <div class="resultWrapper">
+            <div class="resultClass">
+                <span>Favourite dashboards</span>
+                <span class="button favDashBtn hidden">
+                    <i class="fas fa-chevron-right"></i>
+                </span>
+                <span class="button favDashBtn">
+                    <i class="fas fa-chevron-down"></i>
+                </span>
+            </div>
+            <div class="favDashboards">
+                <ul>
+                    {% for dashboard in favDashboards %}
+                        <li>
+                            <a class="button textBtn" href="{{ url_for('dashboards.dashboardPage', name=dashboard.name) }}">
+                                {{ dashboard.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="resultClass">
+                <span>All dashboards</span>
+                <span class="button allDashBtn hidden">
+                    <i class="fas fa-chevron-right"></i>
+                </span>
+                <span class="button allDashBtn">
+                    <i class="fas fa-chevron-down"></i>
+                </span>
+            </div>
+            <div class="allDashboards">
+                <ul>
+                    {% for dashboard in dashboards %}
+                        <li>
+                            <a class="button textBtn" href="{{ url_for('dashboards.dashboardPage', name=dashboard.name) }}">
+                                {{ dashboard.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 </body>
 
 </html>

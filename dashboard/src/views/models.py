@@ -18,6 +18,7 @@ class Datasource(db.Model):
 class Dashboard(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30))
+    url = db.Column(db.String(30))
     timerange = db.Column(db.String(30))
 
     def __init__(self, name):
@@ -38,6 +39,7 @@ class Row(db.Model):
             'Dashboard',
             backref=db.backref('rows', lazy=True)
     )
+    hidden = db.Column(db.Boolean)
 
     def to_dict(self):
         dct = {
@@ -45,6 +47,7 @@ class Row(db.Model):
             "name": self.name,
             "position": self.position,
             "dashboardId": self.dashboardId,
+            "hidden": self.hidden,
         }
         return dct
 
@@ -79,11 +82,11 @@ class Chart(db.Model):
     )
 
     width = db.Column(db.String(30), default="20%")
-    min_width = db.Column(db.String(30))
-    max_width = db.Column(db.String(30))
+    minWidth = db.Column(db.String(30))
+    maxWidth = db.Column(db.String(30))
     height = db.Column(db.String(30), default="200px")
-    min_height = db.Column(db.String(30))
-    max_height = db.Column(db.String(30))
+    minHeight = db.Column(db.String(30))
+    maxHeight = db.Column(db.String(30))
 
     def to_dict(self):
         dct = {
@@ -97,11 +100,11 @@ class Chart(db.Model):
             "visualization": json.loads(self.visualization),
             "style": {
                 "width": self.width,
-                "min_width": self.min_width,
-                "max_width": self.max_width,
+                "minWidth": self.minWidth,
+                "maxWidth": self.maxWidth,
                 "height": self.height,
-                "min_height": self.min_height,
-                "max_height": self.max_height,
+                "minHeight": self.minHeight,
+                "maxHeight": self.maxHeight,
             }
         }
         return dct

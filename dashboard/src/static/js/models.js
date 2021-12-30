@@ -14,6 +14,7 @@ class Dashboard {
         this.currentChartId = null;
         this.rows = {};
         this.rowsByPos = [];
+        this.url = "";
     }
 
     init() {
@@ -26,6 +27,7 @@ class Dashboard {
             success: (response) => {
                 this.timerange = response.timerange;
                 setTimerange(this.timerange);
+                this.url = response.url;
                 this.initRows(response.rows);
                 this.updateCharts();
             },
@@ -66,7 +68,7 @@ class Dashboard {
             this.rowsByPos.push(rowIdPosition[0]);
         })
 
-        var rows_container = document.querySelector('.rows_container');
+        var rows_container = document.querySelector('.rowsContainer');
         this.rowsByPos.forEach((rowId) => {
             var rowElem = this.rows[rowId].getHtml();
             rows_container.appendChild(rowElem);
@@ -75,22 +77,26 @@ class Dashboard {
     }
 
     updateCharts() {
-        this.actualizePositions();
+        if (this.currentView === "chartconf") {
+            updateConfChart();
+        } else {
+            this.actualizePositions();
 
-        for (var rowId in this.rows) {
-            this.rows[rowId].updateCharts();
+            for (var rowId in this.rows) {
+                this.rows[rowId].updateCharts();
+            }
         }
     }
 
     addNewRow() {
         var rowId = createId("row_");
-        var rowName = getDefaultName('.row_name', 'New Row');
+        var rowName = getDefaultName('.rowName', 'New Row');
         var position = 0;
         var newRow = new Row(rowId, rowName, this.id, 0);
         this.rows[rowId] = newRow;
 
         var rowElem = newRow.getHtml();
-        var rowsContainer = document.querySelector(".rows_container");
+        var rowsContainer = document.querySelector(".rowsContainer");
         rowsContainer.insertBefore(rowElem, rowsContainer.firstChild);
 
         this.actualizeRowsPosition();
@@ -129,7 +135,7 @@ class Dashboard {
 
         for (var rowId in this.rows) {
             var row = this.rows[rowId];
-            var qstring = "#" + rowId + " .chart";
+            var qstring = "#" + rowId + " .chartContainer";
             var chartElems = document.querySelectorAll(qstring);
             chartElems.forEach((chartElem) => {
                 row.charts[chartElem.id] = charts[chartElem.id];
@@ -166,6 +172,7 @@ class Row {
         this.position = position;
         this.charts = {};
         this.chartsByPos = [];
+        this.hidden = false;
     }
 
     static fromConf(rowConf) {
@@ -184,16 +191,17 @@ class Row {
             chartsByPos.push(chartIdPosition[0]);
         })
         newRow.chartsByPos = chartsByPos;
+        newRow.hidden = rowConf.hidden;
         return newRow;
     }
 
     getHtml() {
         var rowElem = getRowHtml(this);
         $(() => {
-            var qstring = "#" + this.id + " .charts_container";
+            var qstring = "#" + this.id + " .chartsContainer";
             var chart_container = document.querySelector(qstring);
             $(qstring).sortable({
-                connectWith: ".charts_container",
+                connectWith: ".chartsContainer",
             });
         })
         return rowElem;
@@ -201,12 +209,12 @@ class Row {
 
     addNewChart() {
         var chartId = createId("chart_");
-        var chartName = getDefaultName(".chart_name", "New Chart");
+        var chartName = getDefaultName(".chartName", "New Chart");
         var position = 0;
         var newChart = new Chart(chartId, chartName, this.id, position);
 
         var chartElem = newChart.getHtml();
-        var qstring = '#' + this.id + " .charts_container";
+        var qstring = '#' + this.id + " .chartsContainer";
         var chartsContainer = document.querySelector(qstring);
         chartsContainer.insertBefore(chartElem, chartsContainer.firstChild);
 
@@ -227,7 +235,7 @@ class Row {
     }
 
     actualizeChartsPosition() {
-        var qstring = "#" + this.id + " .charts_container .chart";
+        var qstring = "#" + this.id + " .chartsContainer .chartContainer";
         var charts = document.querySelectorAll(qstring); 
         var chartsByPos = [];
 
@@ -252,20 +260,20 @@ class Chart {
         this.instant = false;
         this.step = "1m";
         this.style = {
-            "width": "20%",
-            "min_width": null,
-            "max_width": null,
+            "width": "20vw",
+            "minWidth": "150px",
+            "maxWidth": null,
             "height": "200px",
-            "min_height": null,
-            "max_height": null,
+            "minHeight": null,
+            "maxHeight": null,
         };
         this.visualization = {
             "type": "line",
             "options": getDefaultOptions("line")
         };
         this.apexChart = null;
-        this.qstring = "#" + id + " .chart_chart";
-        this.chartConfQstring = ".chartconf_chart";
+        this.qstring = "#" + id + " .chart";
+        this.chartConfQstring = ".confChart";
     }
 
     static fromConf(chartConf) {
@@ -273,7 +281,6 @@ class Chart {
             chartConf.id, chartConf.name, chartConf.rowId, chartConf.position);
         newChart.promQuery = chartConf.promQuery;
         newChart.instant = chartConf.instant;
-        console.log("newChart instant: " + newChart.instant);
         newChart.step = chartConf.step;
         newChart.style = chartConf.style;
         newChart.visualization = chartConf.visualization;
@@ -299,9 +306,8 @@ class Chart {
         }
 
         var timeRange = getTimerange();
-        console.log("instant: " + this.instant);
-        console.log("promQuery: " + this.promQuery);
         var requestConf = {
+            "url": window.dashboard.url,
             "promQuery": this.promQuery,
             "instant": this.instant,
             "step": this.step,
@@ -333,7 +339,6 @@ class Chart {
         var qstring = this.getQstring();
         this.apexChart = new ApexCharts(
                 document.querySelector(qstring), chartParams);
-        console.log("rendering chart");
         this.apexChart.render();
     }
 

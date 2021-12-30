@@ -1,0 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+Tamma+2:wght@400;600&display=swap');
+
+* {
+    font-family: 'Baloo Tamma 2', cursive;
+    margin: 0;
+    padding: 0;
+    /* padding and border are included in the width and height: */
+    box-sizing: border-box;
+    /* no list marker */
+    list-style: none;
+    text-decoration: none;
+}
+
+div {
+    color: var(--btn);
+}
+
+nav {
+    position: fixed;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    background: var(--bg);
+    z-index: 1;
+}
+
+.content {
+    position: fixed;
+    margin-top: 40px;
+    padding-top: 10px;
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    overflow: scroll;
+}
+
+.leftArea {
+    display: flex;
+    align-items: center;
+}
+.rightArea {
+    display: flex;
+    align-items: center;
+}
+#dashboardsBtn {
+    padding: 0px 10px;
+    letter-spacing: 2px;
+}
+.dashboardName {
+    padding: 0px 2px;
+}
+.dashboardBar {
+    display: flex;
+    align-items: center;
+}
+.dashboardIcon {
+    font-size: 13px;
+    margin: 0 2px;
+}
+.userProfile {
+    margin: 0px 10px;
+}
+#queryLast:hover {
+    color: var(--btnHover);
+}
+.timerange {
+    border: 1px solid var(--btn);
+    padding: 0px 6px;
+    font-size: 13px;
+    margin: 0px 2px;
+}
+
+
+.button {
+    color: var(--btn);
+    cursor: pointer;
+}
+.button:hover {
+    color: var(--btnHover);
+}
+.buttonSelected {
+    color: var(--btnSelected);
+}
+.textBtn {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.rowHeader{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 30px;
+    background: var(--rowHeader);
+}
+.rowHeaderLeft {
+    display: flex;
+    align-items: center;
+}
+.rowHeaderRight {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+}
+.rowMoveHandle {
+    width: 10px;
+    height: 30px;
+    margin-right: 4px;
+    border-right: 1px solid var(--btn);
+}
+.rowMoveHandle:hover {
+    background: var(--btn);
+}
+.rowName {
+    font-size: 14px;
+    margin-right: 3px;
+}
+.rowIcon {
+    font-size: 11px;
+    margin-left: 2px;
+}
+.chartsContainer {
+    display: flex;
+    min-height: 20px;
+    padding-left: 5px;
+}
+
+
+.chartContainer {
+    margin: 5px;
+    border: 1px solid var(--rowHeader);
+}
+.chartNav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 15px;
+}
+.chartNav span {
+    margin-left: 2px;
+}
+.chartName {
+    font-size: 13px;
+}
+.chartIcon {
+    font-size: 10px;
+}
+
+
+.confNav {
+    display: flex;
+    justify-content: center;
+}
+.confNav ul {
+    display: flex;
+}
+.confNav ul li{
+    margin: 0 10px;
+}
+.confContent {
+    display: flex;
+    justify-content: center;
+}
+
+.chartVis i{
+    width: 60px;
+    height: 60px;
+    font-size: 60px;
+    margin: 10px;
+}
+
+
+.hidden {
+    display: none;
+}

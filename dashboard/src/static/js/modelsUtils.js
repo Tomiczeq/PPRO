@@ -1,25 +1,59 @@
 function getRowHtml(row) {
     var rowElem = document.createElement('div');
     var rowHeader = document.createElement('div');
-    var rowName = document.createElement('span');
+    var rowHeaderLeft = document.createElement('div');
+    var rowHeaderRight = document.createElement('div');
+    var rowMoveHandle = document.createElement('div');
+    var rowName = document.createElement('div');
     var chartsContainer = document.createElement('div');
+
+    // rowName.ondblclick = "this.contentEditable=true;this.className='inEdit';";
+    rowName.addEventListener("dblclick", () => {
+        console.log("doubleclick");
+        rowName.contentEditable = true;
+    })
+    rowName.addEventListener("blur", () => {
+        console.log("blur");
+        rowName.contentEditable = false;
+        row.name = rowName.textContent.trim();
+    })
+    rowName.addEventListener("keydown", function(event) {
+        // Number 13 is the "Enter" key on the keyboard
+        if (event.keyCode === 13) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            rowName.blur();
+        }
+    }); 
 
     var showBtn = get_icon("fas fa-chevron-right", null);
     var hideBtn = get_icon("fas fa-chevron-down", null);
     var addChartBtn = get_icon("fas fa-plus", null);
     var deleteRowBtn = get_icon("fas fa-trash", null);
+    showBtn.classList.add("rowIcon");
+    hideBtn.classList.add("rowIcon");
+    addChartBtn.classList.add("rowIcon");
+    deleteRowBtn.classList.add("rowIcon");
 
-    showBtn.style.display = "none";
+    showBtn.classList.toggle("hidden");
     showBtn.addEventListener("click", () => {
-        showBtn.style.display = "none";
-        hideBtn.style.display = "";
-        chartsContainer.style.display = "";
+        showBtn.classList.toggle("hidden");
+        hideBtn.classList.toggle("hidden");
+        addChartBtn.classList.toggle("hidden");
+        chartsContainer.classList.toggle("hidden");
+        row.hidden = false;
     });
     hideBtn.addEventListener("click", () => {
-        showBtn.style.display = "";
-        hideBtn.style.display = "none";
-        chartsContainer.style.display = "none";
+        showBtn.classList.toggle("hidden");
+        hideBtn.classList.toggle("hidden");
+        addChartBtn.classList.toggle("hidden");
+        chartsContainer.classList.toggle("hidden");
+        row.hidden = true;
     });
+
+    if (row.hidden) {
+        hideBtn.click();
+    }
 
     addChartBtn.addEventListener("click", () => {
         row.addNewChart();
@@ -29,17 +63,24 @@ function getRowHtml(row) {
     });
 
     rowElem.classList.add('row');
-    rowHeader.classList.add('row_header');
-    rowName.classList.add('row_name');
-    chartsContainer.classList.add('charts_container');
+    rowHeader.classList.add('rowHeader');
+    rowHeaderLeft.classList.add('rowHeaderLeft');
+    rowHeaderRight.classList.add('rowHeaderRight');
+    rowMoveHandle.classList.add('rowMoveHandle');
+    rowName.classList.add('rowName');
+    chartsContainer.classList.add('chartsContainer');
 
     rowElem.id = row.id;
     rowName.textContent = row.name;
-    rowHeader.appendChild(rowName);
-    rowHeader.appendChild(showBtn);
-    rowHeader.appendChild(hideBtn);
-    rowHeader.appendChild(addChartBtn);
-    rowHeader.appendChild(deleteRowBtn);
+    rowHeaderLeft.appendChild(rowMoveHandle);
+    rowHeaderLeft.appendChild(rowName);
+    rowHeaderLeft.appendChild(showBtn);
+    rowHeaderLeft.appendChild(hideBtn);
+    rowHeaderLeft.appendChild(addChartBtn);
+    rowHeaderRight.appendChild(deleteRowBtn);
+
+    rowHeader.appendChild(rowHeaderLeft);
+    rowHeader.appendChild(rowHeaderRight);
     rowElem.appendChild(rowHeader);
 
     row.chartsByPos.forEach((chartId) => {
@@ -52,49 +93,84 @@ function getRowHtml(row) {
 }
 
 function getChartHtml(chart) {
-    var chartElem = document.createElement('div');
-    var chartNav = document.createElement('div');
-    var chartChart = document.createElement('div');
+    var chartContainer = document.createElement('div');
+    var chartNav = document.createElement('div')
+    var chartIcons = document.createElement('div')
+    var chartWrapper = document.createElement('div')
+    var chartElem = document.createElement('div')
+
+    var chartSpace = document.createElement('span');
     var chartName = document.createElement('span');
-    var chartIcon = document.createElement('span');
-    var chartIconI = document.createElement('i');
+    var chartCfg = document.createElement('span');
+    var chartDel = document.createElement('span');
 
-    chartElem.classList.add('chart');
-    chartNav.classList.add('chart_nav');
-    chartChart.classList.add('chart_chart');
-    chartName.classList.add('chart_name');
-    chartIcon.classList.add('icon_btn');
-    chartIconI.classList.add('fas');
-    chartIconI.classList.add('fa-cog');
+    var chartCfgI = document.createElement('i');
+    var chartDelI = document.createElement('i');
 
-    chartElem.id = chart.id;
+    chartContainer.classList.add("chartContainer");
+    chartNav.classList.add("chartNav");
+    chartIcons.classList.add("chartIcons");
+    chartWrapper.classList.add("chartWrapper");
+    chartElem.classList.add("chart");
+
+    chartName.classList.add("chartName");
+    chartCfg.classList.add("button");
+    chartCfg.classList.add("iconBtn");
+    chartCfg.classList.add("chartIcon");
+    chartCfgI.classList.add("fas");
+    chartCfgI.classList.add("fa-cog");
+    chartDel.classList.add("button");
+    chartDel.classList.add("iconBtn");
+    chartDel.classList.add("chartIcon");
+    chartDelI.classList.add("fas");
+    chartDelI.classList.add("fa-trash");
+
+    chartContainer.id = chart.id;
     chartName.textContent = chart.name;
 
     for (var styleKey in chart.style) {
         var styleValue = chart.style[styleKey];
         if (styleValue) {
-            chartElem.style[styleKey] = styleValue;
+            chartWrapper.style[styleKey] = styleValue;
         }
     }
-    chartIcon.addEventListener("click", () => {
+    chartNav.style.width = chart.style.width;
+    if (chart.style.minWidth) {
+        chartNav.style.minWidth = chart.style.minWidth;
+    }
+    if (chart.style.maxWidth) {
+        chartNav.style.maxWidth = chart.style.maxWidth;
+    }
+
+    chartCfg.addEventListener("click", () => {
         window.dashboard.currentView = "chartconf";
         window.dashboard.currentChartId = chart.id;
         window.dashboard.currentRowId = chart.rowId;
         showChartSettings(chart)
     });
+    chartDel.addEventListener("click", () => {
+        window.dashboard.actualizePositions();
+        var row = window.dashboard.rows[chart.rowId];
+        row.deleteChart(chart.id);
+    });
 
-    chartIcon.appendChild(chartIconI);
+    chartWrapper.appendChild(chartElem);
+    chartCfg.appendChild(chartCfgI);
+    chartDel.appendChild(chartDelI);
+    chartIcons.appendChild(chartCfg);
+    chartIcons.appendChild(chartDel);
+    chartNav.appendChild(chartSpace);
     chartNav.appendChild(chartName);
-    chartNav.appendChild(chartIcon);
-    chartElem.appendChild(chartNav)
-    chartElem.appendChild(chartChart)
-
-    return chartElem;
+    chartNav.appendChild(chartIcons);
+    chartContainer.appendChild(chartNav);
+    chartContainer.appendChild(chartWrapper);
+    return chartContainer;
 }
 
 function get_icon(cls, id) {
     var span = document.createElement('span');
-    span.classList.add('icon_btn');
+    span.classList.add('button');
+    span.classList.add('iconBtn');
 
     if (id) {
         span.id = id;
@@ -159,14 +235,14 @@ function sortNested(nestedArr, index) {
 }
 
 function setTimerange(timerange) {
-    document.getElementById("query_last").value = timerange.trim();
+    document.getElementById("queryLast").textContent = timerange.trim();
 }
 
 function getTimerange(timerange) {
     var start_date = new Date();
     var end_date = new Date();
 
-    var last = document.getElementById("query_last").value;
+    var last = document.getElementById("queryLast").textContent.trim();
 
     var timerange_type = last.replace(/[0-9]/g, '');
     var timerange_number = last.replace(/[^0-9.]/g, '');

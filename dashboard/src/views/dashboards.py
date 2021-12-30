@@ -13,5 +13,5 @@ def dashboard_page(name):
         abort(404)
 
     return render_template(
-        "dashboard.html", dashboard=dashboard
+        "newDashboard.html", dashboard=dashboard
     )

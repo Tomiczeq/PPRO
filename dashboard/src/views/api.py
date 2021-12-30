@@ -46,20 +46,14 @@ def prometheusRequest():
 
     query_prefix = os.path.join("api/v1", query_type)
 
-    datasource = Datasource.query.first()
-    current_app.logger.info(f"datasource: {datasource}")
+    datasourceUrl = request_conf.get("url")
+    current_app.logger.info(f"datasourceUrl: {datasourceUrl}")
 
-    if not datasource:
-        response["status"] = "no datasource"
-        return make_response(response, 200)
-
-    if not datasource.url:
+    if not datasourceUrl:
         response["status"] = "no datasource url"
         return make_response(response, 200)
 
-    current_app.logger.info(f"datasource_url: {datasource.url}")
-
-    prom_url = os.path.join(datasource.url, query_prefix)
+    prom_url = os.path.join(datasourceUrl, query_prefix)
     current_app.logger.info(f"prom_url: {prom_url}")
     prom_response = requests.get(prom_url, params=params)
     current_app.logger.info(f"response.text: {prom_response.text}")
@@ -94,15 +88,17 @@ def updateDatasource():
 @api.route("/saveDashboard", methods=["POST"])
 def saveDashboard():
     dashboardJson = json.loads(request.form.get('dashboard'))
-    rows_conf = dashboardJson["rows"]
-    timerange = dashboardJson["timerange"]
-    name = dashboardJson["name"]
+    rows_conf = dashboardJson.get("rows")
+    timerange = dashboardJson.get("timerange")
+    name = dashboardJson.get("name")
+    url = dashboardJson.get("url", "")
 
     dashboard = Dashboard.query.get(dashboardJson.get("id", ""))
     if not (dashboard and timerange and name):
         return make_response("Bad request\n", 400)
     dashboard.timerange = timerange
     dashboard.name = name
+    dashboard.url = url
 
     rows = Row.query.filter_by(dashboardId=dashboard.id)
     for row in rows:
@@ -145,6 +141,7 @@ def get_dashboard_charts():
     response = {
         "timerange": dashboard.timerange,
         "rows": rows_conf,
+        "url": dashboard.url
     }
 
     return jsonify(response)

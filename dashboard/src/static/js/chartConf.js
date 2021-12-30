@@ -1,50 +1,50 @@
 function hideChartSettings() {
-    var back_btn = document.getElementById("back_btn");
-    back_btn.classList.remove("icon_btn");
-    back_btn.classList.add("hidden");
+    // change header
+    document.querySelector(".dashboardHeader").classList.remove("hidden");
+    document.querySelector(".confHeader").classList.add("hidden");
 
     // unhighlight chart visualization
-    var visCharts = document.querySelectorAll(".chart_vis");
+    var visCharts = document.querySelectorAll(".chartVis");
     visCharts.forEach((visChart) => {
-        visChart.classList.remove("icon_btn_selected");
-        visChart.classList.add("icon_btn");
+        visChart.classList.remove("buttonSelected");
+        visChart.classList.add("button");
     });
 
-    document.querySelector(".rows_container").style.display = "block";
-    document.querySelector(".chartconf_container").style.display = "none";
+    // show add row button
+    document.getElementById("addRowBtn").classList.remove("hidden");
+
+    document.querySelector(".rowsContainer").classList.remove("hidden");
+    document.querySelector(".confContainer").classList.add("hidden");
 }
 
-// TODO
 function showChartSettings(chart) {
-
-    // show back button
-    var back_btn = document.getElementById("back_btn");
-    back_btn.classList.remove("hidden");
-    back_btn.classList.add("icon_btn");
+    // change header
+    document.querySelector(".dashboardHeader").classList.add("hidden");
+    document.querySelector(".confHeader").classList.remove("hidden");
+    document.querySelector(
+        ".confHeader .dashboardName").textContent = chart.name;
 
     // fill some general options
-    document.querySelector("#prom_query").value = chart.promQuery;
-    document.querySelector("#query_legend").value = 
+    document.querySelector("#promQuery").value = chart.promQuery;
+    document.querySelector("#queryLegend").value = 
             chart.visualization.options.legend;
-    document.querySelector("#query_step").value = chart.step;
-    document.querySelector("#query_type").checked = chart.instant;
+    document.querySelector("#queryStep").value = chart.step;
+    document.querySelector("#queryType").checked = chart.instant;
 
-    document.querySelector(".rows_container").style.display = "none";
-    document.querySelector(".chartconf_container").style.display = "block";
+    document.querySelector(".rowsContainer").classList.add("hidden");
+    document.querySelector(".confContainer").classList.remove("hidden");
 
+    // hide add row button
+    document.getElementById("addRowBtn").classList.add("hidden");
 
     // highlight chart visualization
-    var visCharts = document.querySelectorAll(".chart_vis");
-    visCharts.forEach((visChart) => {
-        var chartType = visChart.id.replace("_chart_btn", "").trim();
-        if (chartType === chart.visualization.type) {
-            visChart.classList.remove("icon_btn");
-            visChart.classList.add("icon_btn_selected");
-        }
-    });
+    var qstring = chart.visualization.type + "ChartBtn";
+    var currentVis = document.getElementById(qstring);
+    currentVis.classList.remove("button");
+    currentVis.classList.add("buttonSelected");
 
     // fill units
-    var xaxisUnits = document.getElementById("xaxis_units");
+    var xaxisUnits = document.getElementById("xaxisUnits");
     xaxisUnits.value = chart.visualization.options.units;
     updateConfChart();
 }
@@ -52,7 +52,7 @@ function showChartSettings(chart) {
 function updateConfChart() {
     var currentChart = window.dashboard.getCurrentChart();
     var container = document.querySelector(
-            ".chartconf_chart_container");
+            ".confChartContainer");
     for (var styleKey in currentChart.style) {
         var styleValue = currentChart.style[styleKey];
         if (styleValue) {
@@ -63,9 +63,9 @@ function updateConfChart() {
 }
 
 
-function init_dashconf() {
+function initChartConf() {
     // back to dashboard button
-    var backBtn = document.getElementById("back_btn");
+    var backBtn = document.getElementById("confBackBtn");
     backBtn.addEventListener("click", () => {
         hideChartSettings();
         window.dashboard.currentView = "dashboard";
@@ -73,48 +73,41 @@ function init_dashconf() {
         currentChart.update();
     });
 
-    // init chartconf navigation
-    var chartconf_nav_items = document.querySelectorAll(".chartconf_nav_li");
-    var chartconf_containers = document.querySelectorAll(
-            ".chartconf_content_hidden");
-    chartconf_nav_items.forEach((nav_item) => {
+    // init chart conf navigation
+    var confNavItems = document.querySelectorAll(".confNavLi");
+    var confContainers = document.querySelectorAll(".confContent");
+    confNavItems.forEach((navItem) => {
 
-        nav_item.addEventListener("click", () => {
+        navItem.addEventListener("click", () => {
+            
+            confNavItems.forEach((navItem) => {
+                navItem.classList.remove("button");
+                navItem.classList.remove("buttonSelected");
+                navItem.classList.add("button");
+            })
+            navItem.classList.remove("button");
+            navItem.classList.add("buttonSelected");
 
-            chartconf_containers.forEach((chartconf_container) => {
-                chartconf_container.classList.remove(
-                        "chartconf_content_hidden");
-                chartconf_container.classList.remove(
-                        "chartconf_content");
-                chartconf_container.classList.add(
-                        "chartconf_content_hidden");
+            confContainers.forEach((confContainer) => {
+                confContainer.classList.remove("hidden");
+                confContainer.classList.add("hidden");
             })
 
-            var current_container_id = nav_item.id.replace(
-                    "btn", "container").trim();
-            var current_container = document.getElementById(
-                    current_container_id);
-            current_container.classList.remove("chartconf_content_hidden");
-            current_container.classList.add("chartconf_content");
+            var currentContainerId = navItem.id.replace(
+                    "Btn", "Container").trim();
+            var currentContainer = document.getElementById(currentContainerId);
+            currentContainer.classList.remove("hidden");
 
         })
     })
-    chartconf_nav_items.forEach((li_item) => {
-        li_item.addEventListener("click", () => {
-
-            chartconf_nav_items.forEach((item) => {
-                item.classList.remove("chartconf_nav_li");
-                item.classList.remove("chartconf_nav_li_selected");
-                item.classList.add("chartconf_nav_li");
-            })
-            li_item.classList.remove("chartconf_nav_li");
-            li_item.classList.remove("chartconf_nav_li_selected");
-            li_item.classList.add("chartconf_nav_li_selected");
-        })
-    })
+    var queryContainer = document.getElementById("confQueryContainer")
+    queryContainer.classList.remove("hidden")
+    var queryNav = document.getElementById("confQueryBtn");
+    queryNav.classList.remove("button");
+    queryNav.classList.add("buttonSelected");
 
     // general section init
-    var queryInput = document.getElementById("prom_query");
+    var queryInput = document.getElementById("promQuery");
     queryInput.addEventListener("keyup", function(event) {
         // Number 13 is the "Enter" key on the keyboard
         if (event.keyCode === 13) {
@@ -127,7 +120,7 @@ function init_dashconf() {
         }
     }); 
 
-    var queryStep = document.getElementById("query_step");
+    var queryStep = document.getElementById("queryStep");
     queryStep.addEventListener("keyup", function(event) {
         // Number 13 is the "Enter" key on the keyboard
         if (event.keyCode === 13) {
@@ -140,7 +133,7 @@ function init_dashconf() {
         }
     }); 
 
-    var queryLegend = document.getElementById("query_legend");
+    var queryLegend = document.getElementById("queryLegend");
     queryLegend.addEventListener("keyup", function(event) {
         // Number 13 is the "Enter" key on the keyboard
         if (event.keyCode === 13) {
@@ -154,7 +147,7 @@ function init_dashconf() {
         }
     }); 
 
-    var query_type = document.getElementById("query_type");
+    var query_type = document.getElementById("queryType");
     query_type.addEventListener('change', function() {
         var currentChart = window.dashboard.getCurrentChart();
         currentChart.instant = this.checked;
@@ -163,7 +156,7 @@ function init_dashconf() {
 
 
     // axes
-    var xaxisUnits = document.getElementById("xaxis_units");
+    var xaxisUnits = document.getElementById("xaxisUnits");
     xaxisUnits.addEventListener("keyup", (event) => {
         // Number 13 is the "Enter" key on the keyboard
         if (event.keyCode === 13) {
@@ -178,21 +171,21 @@ function init_dashconf() {
     
 
     // visualisation section
-    var visCharts = document.querySelectorAll(".chart_vis");
+    var visCharts = document.querySelectorAll(".chartVis");
     visCharts.forEach((visChart) => {
         visChart.addEventListener("click", () => {
 
             visCharts.forEach((visChart) => {
-                visChart.classList.remove("icon_btn_selected");
-                visChart.classList.add("icon_btn");
+                visChart.classList.remove("buttonSelected");
+                visChart.classList.add("button");
             })
 
-            visChart.classList.remove("icon_btn");
-            visChart.classList.add("icon_btn_selected");
+            visChart.classList.remove("button");
+            visChart.classList.add("buttonSelected");
 
 
             var currentChart = window.dashboard.getCurrentChart();
-            var chartType = visChart.id.replace("_chart_btn", "").trim();
+            var chartType = visChart.id.replace("ChartBtn", "").trim();
             currentChart.visualization.type = chartType;
             currentChart.visualization.options = getDefaultOptions(chartType);
             updateConfChart();
@@ -200,4 +193,4 @@ function init_dashconf() {
     });
 }
 
-init_dashconf();
+initChartConf();

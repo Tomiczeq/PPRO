@@ -3,6 +3,13 @@ function hideChartSettings() {
     back_btn.classList.remove("icon_btn");
     back_btn.classList.add("hidden");
 
+    // unhighlight chart visualization
+    var visCharts = document.querySelectorAll(".chart_vis");
+    visCharts.forEach((visChart) => {
+        visChart.classList.remove("icon_btn_selected");
+        visChart.classList.add("icon_btn");
+    });
+
     document.querySelector(".rows_container").style.display = "block";
     document.querySelector(".chartconf_container").style.display = "none";
 }

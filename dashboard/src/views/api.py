@@ -10,11 +10,13 @@ from views.models import Dashboard
 from views.models import Chart
 from views.models import Row
 from flask import current_app
+from flask_login import login_required
 
 api = Blueprint('api', __name__)
 
 
 @api.route("/prometheusRequest", methods=["GET"])
+@login_required
 def prometheusRequest():
     response = {
         "status": "err",
@@ -59,6 +61,7 @@ def prometheusRequest():
 
 
 @api.route("/saveDashboard", methods=["POST"])
+@login_required
 def saveDashboard():
     dashboardJson = json.loads(request.form.get('dashboard'))
     rows_conf = dashboardJson.get("rows")
@@ -94,6 +97,7 @@ def saveDashboard():
 
 
 @api.route("/getDashboardCharts", methods=["GET"])
+@login_required
 def get_dashboard_charts():
     dashboardId = request.args.get('dashboardId')
 

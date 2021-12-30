@@ -6,6 +6,8 @@ from flask import url_for
 from flask import request
 
 from flask_login import login_user
+from flask_login import login_required
+from flask_login import logout_user
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
@@ -71,5 +73,7 @@ def signUpPost():
 
 
 @auth.route('/logout')
+@login_required
 def logout():
-    return render_template("login.html")
+    logout_user()
+    return redirect(url_for('auth.loginGet'))

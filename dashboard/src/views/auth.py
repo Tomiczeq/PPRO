@@ -51,16 +51,16 @@ def signUpPost():
 
     if not username:
         flash("Empty username")
-        return redirect(url_for('auth.signup'))
+        return redirect(url_for('auth.signUpGet'))
 
     if not password:
         flash("Empty password")
-        return redirect(url_for('auth.signup'))
+        return redirect(url_for('auth.signUpGet'))
 
     user = User.query.filter_by(username=username).first()
     if user:
-        flash("Username: {username} already exists")
-        return redirect(url_for('auth.signup'))
+        flash(f"user {username} already exists")
+        return redirect(url_for('auth.signUpGet'))
 
     newUser = User(username=username,
                    password=generate_password_hash(password, method='sha256'))

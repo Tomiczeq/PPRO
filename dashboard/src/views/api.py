@@ -7,19 +7,11 @@ from flask import make_response
 from flask import jsonify
 from views.models import db
 from views.models import Dashboard
-from views.models import Datasource
 from views.models import Chart
 from views.models import Row
 from flask import current_app
 
 api = Blueprint('api', __name__)
-
-
-@api.route("/getDatasource", methods=["GET"])
-def getDatasource():
-    datasources = Datasource.query.all()
-    datasources = [datasource.to_dict() for datasource in datasources]
-    return make_response(jsonify(datasources), 200)
 
 
 @api.route("/prometheusRequest", methods=["GET"])
@@ -64,25 +56,6 @@ def prometheusRequest():
     response["status"] = "ok"
     response["data"] = prom_response.json()
     return make_response(response, 200)
-
-
-@api.route("/updateDatasource", methods=["POST"])
-def updateDatasource():
-    datasources = Datasource.query.all()
-    for datasource in datasources:
-        db.session.delete(datasource)
-
-    datasource = Datasource()
-    url = request.form.get('datasource_url')
-
-    if isinstance(url, str):
-        datasource.url = url
-    else:
-        return make_response("Bad request\n", 400)
-
-    db.session.add(datasource)
-    db.session.commit()
-    return make_response("", 200)
 
 
 @api.route("/saveDashboard", methods=["POST"])

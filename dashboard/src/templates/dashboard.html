@@ -1,138 +1,209 @@
-{% extends 'navigation.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/colors.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 
-{% block title %} {{ dashboard.name }} {% endblock %}
+    <!-- TODO comment -->
+    <script src="https://kit.fontawesome.com/d8730202bf.js"></script>
+</head>
+<body>
 
-{% block content %}
+    <nav>
 
-    <div class="dashboard_navbar">
-        <div class="dashboard_profile">
-            <span id="back_btn" class="hidden">
-                <i class="fas fa-arrow-left"></i>
-            </span>
-            <span>{{ dashboard.name }}</span>
-        </div>
-        <div class="dashboard_btns">
-            <span class="date_range">
-                <span>last</span>
-                <input id="query_last" type="text" value="{{ dashboard.timerange }}">
-            </span>
-            <span class="icon_btn" id="add_row_btn">
-                <i class="fas fa-plus"></i>
-            </span>
-            <span class="icon_btn" id="save_dashboard_btn">
-                <i class="fas fa-save"></i>
-            </span>
-            <span class="icon_btn" id="refresh_dashboard_btn">
-                <i class="fas fa-sync"></i>
-            </span>
-        </div>
-    </div>
-
-    <div class="rows_container">
-    </div>
-
-    <div class="chartconf_container">
-
-        <div class="chartconf_header"></div>
-
-        <div class="chartconf_chart_container">
-            <div class="chartconf_chart">
+        <div class="leftArea">
+            <span class="button textBtn" id="dashboardsBtn">dashboards</span>
+            <div class="confHeader hidden">
+                <span class="button iconBtn dashboardIcon"
+                      id="confBackBtn">
+                    <i class="fas fa-arrow-left"></i>
+                </span>
+                <span class="dashboardName"></span>
+            </div>
+            <div class="dashboardHeader">
+                <span class="dashboardName">{{ dashboard.name }}</span>
+                <span class="button iconBtn dashboardIcon" id="dashboardFav">
+                    <i class="fas fa-star"></i>
+                </span>
+                <span class="button iconBtn dashboardIcon" id="dashboardConf">
+                    <i class="fas fa-cog"></i>
+                </span>
+            </div>
+            <div class="dashConfHeader hidden">
+                <span class="button iconBtn dashboardIcon"
+                      id="dashConfBackBtn">
+                    <i class="fas fa-arrow-left"></i>
+                </span>
+                <span class="dashboardName">{{ dashboard.name }}</span>
+                <span class="button iconBtn dashboardIcon" id="dashboardFav">
+                    <i class="fas fa-star"></i>
+                </span>
             </div>
         </div>
 
-        <div class="chartconf_nav">
-            <ul>
-                <li id="chartconf_general_btn", class="chartconf_nav_li">
-                    general
-                </li>
-                <li id="chartconf_query_btn", class="chartconf_nav_li">
-                    query
-                </li>
-                <li id="chartconf_visualization_btn", class="chartconf_nav_li">
-                    Visualisation
-                </li>
-                <li id="chartconf_axes_btn", class="chartconf_nav_li">
-                    axes
-                </li>
-                <li id="chartconf_display_btn", class="chartconf_nav_li">
-                    display
-                </li>
-            </ul>
+        <div class="middleArea">
+            <div class="dashboardBar">
+                <div class="timerange">
+                    <span>last</span>
+                    <span id="queryLast" contenteditable="true">
+                        {{ dashboard.timerange }}
+                    </span>
+                </div>
+                <span class="button iconBtn dashboardIcon" id="addRowBtn">
+                    <i class="fas fa-plus"></i>
+                </span>
+                <span class="button IconBtn dashboardIcon" id="saveDashboardBtn">
+                    <i class="fas fa-save"></i>
+                </span>
+                <span class="button IconBtn dashboardIcon" id="refreshDashboardBtn">
+                    <i class="fas fa-sync"></i>
+                </span>
+            </div>
         </div>
 
-        <!-- Obsah jednotlivych nastaveni -->
-        <div class="chartconf_wrapper">
-            <div class="chartconf_content_hidden", id="chartconf_general_container">
+        <div class="rightArea">
+            <div class="userProfile">
+                <span>username</span>
+                <span class="button iconBtn dashboardIcon">
+                    <i class="fas fa-power-off"></i>
+                </span>
             </div>
+        </div>
+        
+    </nav>
 
-            <div class="chartconf_content_hidden", id="chartconf_query_container">
-                <div class="query_wrapper">
-                    <div class="query">
-                        <span>query:</span>
-                        <input type="text" id="prom_query">
+    <div class="content">
+        <div class="rowsContainer">
+            <!-- <div class="chartContainer">
+                <div class="chartNav">
+                    <span></span>
+                    <span>chartName</span>
+                    <div class="chartIcons">
+                        <span class="button iconBtn">
+                            <i class="fas fa-cog"></i>
+                        </span>
+                        <span class="button iconBtn">
+                            <i class="fas fa-trash"></i>
+                        </span>
                     </div>
-                    <div class="query_options">
-                        <div>
-                            <span>legend</span>
-                            <input id="query_legend" type="text">
-                        </div>
-                        <div>
-                            <span>step</span>
-                            <input id="query_step" type="text">
-                        </div>
-                        <div>
-                            <span>instant</span>
-                            <input type="checkbox", id="query_type">
-                        </div>
+                </div>
+                <div class="chartWrapper">
+                    <div class="chart">
+
                     </div>
+                </div>
+            </div> -->
+        </div>
+
+        <div class="dashConfContainer hidden">
+            <div>
+                <span>name</span>
+                <input id="dashboardName" type="text" value="{{ dashboard.name }}">
+            </div>
+            <div>
+                <span>Datasource url : </span>
+                {% if dashboard.url %}
+                    <input id="datasourceUrl"type="text"
+                            value="{{ dashboard.url }}">
+                {% else %}
+                    <input id="datasourceUrl"type="text">
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="confContainer hidden">
+
+            <div class="confChartContainer">
+                <div class="confChart">
                 </div>
             </div>
 
-            <div class="chartconf_content_hidden", id="chartconf_visualization_container">
+            <div class="confNav">
                 <ul>
-                    <li>
-                        <span class="icon_btn chart_vis" id="line_chart_btn">
-                            <i class="fas fa-chart-line"></i>
-                        </span>
-                        <span class="icon_btn chart_vis" id="pie_chart_btn">
-                            <i class="fas fa-chart-pie"></i>
-                        </span>
+                    <li id="confGeneralBtn", class="button textBtn confNavLi">
+                        general
                     </li>
-                    <li>
-                        <span class="icon_btn chart_vis" id="area_chart_btn">
-                            <i class="fas fa-chart-area"></i>
-                        </span>
-                        <span class="icon_btn chart_vis" id="heatmap_chart_btn">
-                            <i class="fas fa-table"></i>
-                        </span>
+                    <li id="confQueryBtn", class="button textBtn confNavLi">
+                        query
                     </li>
-                    <li>
-                        <span class="icon_btn chart_vis" id="column_chart_btn">
-                            <i class="fas fa-chart-bar"></i>
-                        </span>
-                        <span class="icon_btn chart_vis" id="donut_chart_btn">
-                            <i class="far fa-life-ring"></i>
-                        </span>
+                    <li id="confVisualizationBtn", class="button textBtn confNavLi">
+                        Visualisation
+                    </li>
+                    <li id="confAxesBtn", class="button textBtn confNavLi">
+                        axes
                     </li>
                 </ul>
             </div>
 
-            <div class="chartconf_content_hidden", id="chartconf_axes_container">
-                <div>
-                    <span>xaxis units: </span>
-                    <input id="xaxis_units" type="text">
+            <!-- Obsah jednotlivych nastaveni -->
+            <div class="confWrapper">
+                <div class="confContent hidden", id="confGeneralContainer">
                 </div>
-            </div>
 
-            <div class="chartconf_content_hidden", id="chartconf_display_container">
+                <div class="confContent hidden", id="confQueryContainer">
+                    <div class="queryWrapper">
+                        <div class="query">
+                            <span>query:</span>
+                            <input type="text" id="promQuery">
+                        </div>
+                        <div class="queryOptions">
+                            <div>
+                                <span>legend</span>
+                                <input id="queryLegend" type="text">
+                            </div>
+                            <div>
+                                <span>step</span>
+                                <input id="queryStep" type="text">
+                            </div>
+                            <div>
+                                <span>instant</span>
+                                <input type="checkbox", id="queryType">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="confContent hidden", id="confVisualizationContainer">
+                    <ul>
+                        <li>
+                            <span class="button iconBtn chartVis" id="lineChartBtn">
+                                <i class="fas fa-chart-line"></i>
+                            </span>
+                            <span class="button iconBtn chartVis" id="pieChartBtn">
+                                <i class="fas fa-chart-pie"></i>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="button iconBtn chartVis" id="areaChartBtn">
+                                <i class="fas fa-chart-area"></i>
+                            </span>
+                            <span class="button iconBtn chartVis" id="heatmapChartBtn">
+                                <i class="fas fa-table"></i>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="button iconBtn chartVis" id="columnChartBtn">
+                                <i class="fas fa-chart-bar"></i>
+                            </span>
+                            <span class="button iconBtn chartVis" id="donutChartBtn">
+                                <i class="far fa-life-ring"></i>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="confContent hidden", id="confAxesContainer">
+                    <div>
+                        <span>xaxis units: </span>
+                        <input id="xaxisUnits" type="text">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-{% endblock %}
-
-
-{% block scripts %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="{{ url_for('static', filename='js/modelsUtils.js') }}"></script>
@@ -153,4 +224,6 @@
         var currentChartId = null;
         init_dashboard();
     </script>
-{% endblock %}
+
+</body>
+</html>

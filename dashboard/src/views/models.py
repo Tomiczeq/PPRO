@@ -1,18 +1,14 @@
 import json
+from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
 
-class Datasource(db.Model):
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    url = db.Column(db.String(30))
-
-    def to_dict(self):
-        dct = {
-            "url": self.url,
-        }
-        return dct
+    username = db.Column(db.String(1000), unique=True)
+    password = db.Column(db.String(100))
 
 
 class Dashboard(db.Model):

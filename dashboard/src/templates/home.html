@@ -1,17 +1,15 @@
-{% extends 'navigation.html' %}
+<!DOCTYPE html>
+<html>
 
-{% block title %} Home {% endblock %}
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/colors.css') }}">
+</head>
 
-{% block content %}
-    <h1>Hello World!</h1>
-{% endblock %}
+<body>
 
-{% block scripts %}
+    Helloe
 
-<script>
-    var selected_btn = document.getElementById("nav_home_btn");
-    selected_btn.classList.remove("nav_button");
-    selected_btn.classList.add("nav_button_selected");
-</script>
+</body>
 
-{% endblock %}
+</html>

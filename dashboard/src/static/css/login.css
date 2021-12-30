@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+Tamma+2:wght@400;600&display=swap');
+
+* {
+    font-family: 'Baloo Tamma 2', cursive;
+    margin: 0;
+    padding: 0;
+    /* padding and border are included in the width and height: */
+    box-sizing: border-box;
+    /* no list marker */
+    list-style: none;
+    text-decoration: none;
+}
+
+body {
+    background: var(--bg);
+    color: var(--btn);
+}
+
+.wrapper {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.loginForm {
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+}
+
+.errNotification {
+    color: var(--error-fg);
+}
+
+.button {
+    color: var(--btn);
+    cursor: pointer;
+    background: var(--bg);
+    border: none;
+}
+.button:hover {
+    color: var(--btnHover);
+}
+.textBtn {
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+input {
+    margin: 3px 0px;
+    background: transparent;
+    color: var(--btn);
+    border: none;
+    border-bottom: 1px solid var(--btn);
+}
+
+input:focus {
+    outline: none;
+}

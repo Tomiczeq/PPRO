@@ -6,4 +6,6 @@
 
     /* --rowHeader: #1f3d55; */
     --rowHeader: #1d374e;
+
+    --error-fg: rgba(255, 0, 0, 0.342);
 }

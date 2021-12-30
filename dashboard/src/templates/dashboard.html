@@ -25,9 +25,16 @@
             </div>
             <div class="dashboardHeader">
                 <span class="dashboardName">{{ dashboard.name }}</span>
-                <span class="button iconBtn dashboardIcon" id="dashboardFav">
-                    <i class="fas fa-star"></i>
-                </span>
+
+                {% if favourite %}
+                    <span class="dashboardIcon favourite" id="dashboardFav">
+                        <i class="fas fa-star"></i>
+                    </span>
+                {% else %}
+                    <span class="dashboardIcon button" id="dashboardFav">
+                        <i class="fas fa-star"></i>
+                    </span>
+                {% endif %}
                 <span class="button iconBtn dashboardIcon" id="dashboardConf">
                     <i class="fas fa-cog"></i>
                 </span>

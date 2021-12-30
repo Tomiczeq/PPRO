@@ -11,6 +11,28 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(100))
 
 
+class FavDashboard(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    dashboardId = db.Column(
+            db.Integer,
+            db.ForeignKey('dashboard.id'),
+            nullable=False
+    )
+    userId = db.Column(
+            db.Integer,
+            db.ForeignKey('user.id'),
+            nullable=False
+    )
+    dashboard = db.relationship(
+            'Dashboard',
+            backref=db.backref('favDashboards', lazy=True)
+    )
+    user = db.relationship(
+            'User',
+            backref=db.backref('favDashboards', lazy=True)
+    )
+
+
 class Dashboard(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30))

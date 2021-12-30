@@ -27,6 +27,13 @@ function init_dashboard() {
         });
     })
 
+    // favourite button
+    var favBtn = document.getElementById("dashboardFav");
+    favBtn.addEventListener("click", () => {
+        favBtn.classList.toggle("favourite");
+        favBtn.classList.toggle("button");
+    })
+
     // back to dashboard button
     var backBtn = document.getElementById("dashConfBackBtn");
     backBtn.addEventListener("click", () => {

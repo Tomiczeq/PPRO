@@ -7,10 +7,12 @@ from flask import make_response
 from flask import jsonify
 from views.models import db
 from views.models import Dashboard
+from views.models import FavDashboard
 from views.models import Chart
 from views.models import Row
 from flask import current_app
 from flask_login import login_required
+from flask_login import current_user
 
 api = Blueprint('api', __name__)
 
@@ -64,6 +66,7 @@ def prometheusRequest():
 @login_required
 def saveDashboard():
     dashboardJson = json.loads(request.form.get('dashboard'))
+    dashboardId = dashboardJson.get("id", "")
     rows_conf = dashboardJson.get("rows")
     timerange = dashboardJson.get("timerange")
     name = dashboardJson.get("name")
@@ -92,6 +95,17 @@ def saveDashboard():
                 chart = Chart.from_conf(chart_conf)
                 db.session.add(chart)
 
+    userFav = dashboardJson.get("userFav", False)
+    favourite = (FavDashboard.query
+                             .filter_by(userId=current_user.id)
+                             .filter_by(dashboardId=dashboardId)
+                             .first())
+    if userFav and not favourite:
+        favourite = FavDashboard(userId=current_user.id,
+                                 dashboardId=dashboardId)
+        db.session.add(favourite)
+    elif favourite and not userFav:
+        db.session.delete(favourite)
     db.session.commit()
     return make_response("", 200)
 

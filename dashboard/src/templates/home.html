@@ -23,11 +23,13 @@
                     <i class="fas fa-times"></i>
                 </span>
             </div>
-            <div class="createDashboard">
-                <span id="createDashboardBtn" class="button createBarIcon">
+            <form method="post" class="createDashboard"
+                  action="{{ url_for('dashboards.createDashboard') }}">
+                <button type="submit" id="createDashboardBtn"
+                        class="button createBarIcon">
                     <i class="fas fa-plus"></i>
-                </span>
-            </div>
+                </button>
+            </form>
         </div>
     </nav>
 
@@ -44,12 +46,14 @@
             </div>
             <div class="favDashboards">
                 <ul>
-                    {% for dashboard in favDashboards %}
-                        <li>
-                            <a class="button textBtn" href="{{ url_for('dashboards.dashboardPage', name=dashboard.name) }}">
-                                {{ dashboard.name }}
-                            </a>
-                        </li>
+                    {% for dashboard in dashboards %}
+                        {% if dashboard.favourite %}
+                            <li>
+                                <a class="button textBtn" href="{{ url_for('dashboards.dashboardPage', name=dashboard.name) }}">
+                                    {{ dashboard.name }}
+                                </a>
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </div>

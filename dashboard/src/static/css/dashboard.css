@@ -88,6 +88,10 @@ nav {
     letter-spacing: 2px;
 }
 
+.favourite {
+    color: var(--btnSelected);
+}
+
 .rowHeader{
     display: flex;
     justify-content: space-between;

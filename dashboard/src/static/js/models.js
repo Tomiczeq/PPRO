@@ -38,6 +38,8 @@ class Dashboard {
     }
 
     save() {
+        this.userFav = this.isFav();
+        console.log("this.userFav: " + this.userFav);
         this.actualizePositions();
         $.ajax({
             type: "POST",
@@ -52,6 +54,11 @@ class Dashboard {
                 this.showError("Save error");
             },
         });
+    }
+
+    isFav() {
+        return document.getElementById(
+            "dashboardFav").classList.contains("favourite");
     }
 
     initRows(rowsConf) {

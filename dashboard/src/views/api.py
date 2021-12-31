@@ -38,7 +38,7 @@ def prometheusRequest():
         params["start"] = request_conf["start"]
         params["end"] = request_conf["end"]
 
-    current_app.logger.info(f"params: {params}")
+    current_app.logger.info(f"requestConf: {request_conf}")
 
     query_prefix = os.path.join("api/v1", query_type)
 
@@ -51,7 +51,12 @@ def prometheusRequest():
 
     prom_url = os.path.join(datasourceUrl, query_prefix)
     current_app.logger.info(f"prom_url: {prom_url}")
-    prom_response = requests.get(prom_url, params=params)
+    try:
+        prom_response = requests.get(prom_url, params=params)
+    except requests.exceptions.ConnectionError:
+        response["status"] = "connection error"
+        return make_response(response, 200)
+
     current_app.logger.info(f"response.text: {prom_response.text}")
 
     if prom_response.status_code != 200:

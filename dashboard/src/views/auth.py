@@ -8,7 +8,6 @@ from flask import request
 from flask_login import login_user
 from flask_login import login_required
 from flask_login import logout_user
-from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 
 from views.models import User
@@ -34,7 +33,7 @@ def loginPost():
     # take the user-supplied password, hash it, and compare it
     # to the hashed password in the database
     if not user or not check_password_hash(user.password, password):
-        flash('Invalid credentials')
+        flash('Invalid credentials', "error")
         return redirect(url_for('auth.loginGet'))
 
     login_user(user)
@@ -61,14 +60,15 @@ def signUpPost():
 
     user = User.query.filter_by(username=username).first()
     if user:
-        flash(f"user {username} already exists")
+        flash(f"User {username} already exists")
         return redirect(url_for('auth.signUpGet'))
 
     newUser = User(username=username,
-                   password=generate_password_hash(password, method='sha256'))
+                   password=password)
 
     db.session.add(newUser)
     db.session.commit()
+    flash("You have successfully signed up. Now you can log in.", "success")
     return redirect(url_for('auth.loginGet'))
 
 
@@ -76,4 +76,5 @@ def signUpPost():
 @login_required
 def logout():
     logout_user()
+    flash("You have been successfully logged out", "success")
     return redirect(url_for('auth.loginGet'))

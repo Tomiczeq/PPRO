@@ -1,0 +1,23 @@
+version: "3"
+services:
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: "tests/Dockerfile"
+    network_mode: "host"
+    volumes:
+      - ./conf:/www/ppro/dashboard/conf
+      - ./src:/www/ppro/dashboard/src
+      - ./scripts:/www/ppro/dashboard/scripts
+      - ./tests:/www/ppro/dashboard/tests
+    working_dir: /www/ppro/dashboard/tests
+    entrypoint: ../scripts/entrypoint.sh
+    command: bash -c "while true; do sleep 1; done"
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      - MYSQL_DATABASE=test  # TODO rename
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    network_mode: "host"

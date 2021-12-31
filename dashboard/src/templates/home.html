@@ -11,30 +11,34 @@
 <body>
 
     <nav>
-        <div class="bar">
-            <div class="searchBar">
-                <span>
-                    <input id="searchText" type="text">
-                </span>
-                <span id="searchDashboardBtn" class="button searchBarIcon">
-                    <i class="fas fa-search"></i>
-                </span>
-                <span id="stopSearchBtn" class="button searchBarIcon">
-                    <i class="fas fa-times"></i>
-                </span>
-            </div>
+        <div>a</div>
+        <div>
             <form method="post" class="createDashboard"
-                  action="{{ url_for('dashboards.createDashboard') }}">
+                action="{{ url_for('dashboards.createDashboard') }}">
                 <button type="submit" id="createDashboardBtn"
                         class="button createBarIcon">
-                    <i class="fas fa-plus"></i>
+                        New Dashboard
                 </button>
             </form>
+        </div>
+        <div class="userProfile">
+            <span>{{ user.username }}</span>
+            <a class="button iconBtn dashboardIcon" href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-power-off"></i>
+            </a>
         </div>
     </nav>
 
     <div class="searchContent">
         <div class="resultWrapper">
+            <div class="bar">
+                <div class="searchBar">
+                    <span>
+                        <input id="searchText" type="text" placeholder="search">
+                    </span>
+                </div>
+            </div>
+
             <div class="resultClass">
                 <span>Favourite dashboards</span>
                 <span class="button favDashBtn hidden">

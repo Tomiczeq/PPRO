@@ -12,11 +12,7 @@ from views.models import User
 from views.models import Dashboard  # TODO docasne
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Sample app")
-    parser.add_argument("--conf", action="store",
-                        default="conf/server.conf")
-
+def create_app(config):
     app = Flask(__name__)
     app.register_blueprint(auth)
     app.register_blueprint(api, url_prefix="/api")
@@ -31,23 +27,29 @@ if __name__ == "__main__":
     def loadUser(user_id):
         return User.query.get(user_id)
 
-    args = parser.parse_args()
-    config = configparser.ConfigParser()
-    config.read(args.conf)
-
     app.config['SQLALCHEMY_DATABASE_URI'] = config.get("database", "uri")
     app.config['SECRET_KEY'] = config.get("server", "secretKey")
 
-    # TODO remove this later
+    if config.getboolean("server", "test", fallback=False):
+        app.config["TESTING"] = True
     with app.app_context():
         db.create_all()
-        sentinel = Dashboard('sentinel')
-        db.session.add(sentinel)
         db.session.commit()
+    return app
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Sample app")
+    parser.add_argument("--conf", action="store",
+                        default="conf/server.conf")
+    args = parser.parse_args()
+    config = configparser.ConfigParser()
+    config.read(args.conf)
 
     port = config.getint("server", "port", fallback=8080)
     host = config.get("server", "host", fallback="0.0.0.0")
     debug = config.getboolean("server", "debug", fallback=True)
     prometheus_url = config.get("prometheus", "address")
 
-    app.run(host=host, port=port, debug=True)
+    app = create_app(config)
+    app.run(host=host, port=port, debug=debug)

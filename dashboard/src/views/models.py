@@ -1,6 +1,7 @@
 import json
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash
 
 db = SQLAlchemy()
 
@@ -9,6 +10,10 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(1000), unique=True)
     password = db.Column(db.String(100))
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = generate_password_hash(password, method='sha256')
 
 
 class FavDashboard(db.Model):

@@ -19,10 +19,10 @@ body {
 nav {
     position: fixed;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     width: 100%;
-    height: 80px;
+    height: 40px;
     z-index: 1;
 }
 
@@ -43,7 +43,8 @@ nav {
 
 .bar {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    width: 100%
 }
 
 .searchBar {

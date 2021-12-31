@@ -35,6 +35,9 @@ body {
 .errNotification {
     color: var(--error-fg);
 }
+.successNotification {
+    color: var(--success-fg);
+}
 
 .button {
     color: var(--btn);

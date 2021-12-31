@@ -61,4 +61,6 @@ def homePage():
                                  .first())
         dashboard.favourite = bool(favourite)
 
-    return render_template("home.html", dashboards=dashboards)
+    return render_template(
+        "home.html", dashboards=dashboards, user=current_user
+    )

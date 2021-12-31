@@ -11,11 +11,17 @@
 
     <div class="wrapper">
 
-        {% with messages = get_flashed_messages() %}
+        {% with messages = get_flashed_messages(with_categories=True) %}
         {% if messages %}
-            <div class="errNotification">
-                {{ messages[0] }}
-            </div>
+            {% if messages[0][0] ==  'success' %}
+                <div class="successNotification">
+                    {{ messages[0][1] }}
+                </div>
+            {% else %}
+                <div class="errNotification">
+                    {{ messages[0][1] }}
+                </div>
+            {% endif %}
         {% endif %}
         {% endwith %}
         <form class="loginForm" method="POST" action="/login">

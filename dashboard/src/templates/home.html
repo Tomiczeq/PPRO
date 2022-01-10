@@ -11,7 +11,7 @@
 <body>
 
     <nav>
-        <div>a</div>
+        <div class="navSide"></div>
         <div>
             <form method="post" class="createDashboard"
                 action="{{ url_for('dashboards.createDashboard') }}">
@@ -21,9 +21,9 @@
                 </button>
             </form>
         </div>
-        <div class="userProfile">
+        <div class="navSide">
             <span>{{ user.username }}</span>
-            <a class="button iconBtn dashboardIcon" href="{{ url_for('auth.logout') }}">
+            <a class="button iconBtn" href="{{ url_for('auth.logout') }}">
                 <i class="fas fa-power-off"></i>
             </a>
         </div>

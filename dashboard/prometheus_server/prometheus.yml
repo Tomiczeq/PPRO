@@ -1,0 +1,31 @@
+## prometheus.yml ##
+
+global:
+  # How frequently to scrape targets by default.
+  scrape_interval: 15s # By default, scrape targets every 15 seconds.
+
+  # How long until a scrape request times out.
+  scrape_timeout: 10s
+
+  # How frequently to evaluate rules.
+  evaluation_interval: 15s
+
+# Rule files specifies a list of globs. Rules and alerts are read from
+# all matching files.
+rule_files:
+  - '/etc/prometheus/alert.rules'
+
+# A scrape configuration containing exactly one endpoint to scrape:
+scrape_configs:
+# The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+
+  # Panamax
+  - job_name: 'test'
+    # Override the global default and scrape targets from this job every 5 seconds.
+    #scrape_interval: 15s
+    #scrape_timeout: 10s
+
+    static_configs:
+      - targets: ['localhost:8015']
+        labels:
+          group: 'test'

@@ -36,6 +36,14 @@ nav {
     overflow: scroll;
 }
 
+input {
+    margin: 0px 0px;
+    background: transparent;
+    color: var(--btn);
+    border: none;
+    border-bottom: 1px solid var(--btn);
+}
+
 .leftArea {
     display: flex;
     align-items: center;
@@ -62,6 +70,7 @@ nav {
 .userProfile {
     margin: 0px 10px;
 }
+
 #queryLast:hover {
     color: var(--btnHover);
 }
@@ -74,7 +83,9 @@ nav {
 
 
 .button {
+    border: none;
     color: var(--btn);
+    background: var(--bg);
     cursor: pointer;
 }
 .button:hover {
@@ -86,6 +97,12 @@ nav {
 .textBtn {
     text-transform: uppercase;
     letter-spacing: 2px;
+}
+
+.deleteDashboard {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
 }
 
 .favourite {
@@ -175,6 +192,23 @@ nav {
     margin: 10px;
 }
 
+.dashConfContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.optionsWrapper {
+    margin-top: 15px;
+}
+
+.optionWrapper {
+    display: flex;
+}
+
+.optionName {
+    width: 130px;
+}
 
 .hidden {
     display: none;

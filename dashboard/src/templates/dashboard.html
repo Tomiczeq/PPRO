@@ -45,9 +45,6 @@
                     <i class="fas fa-arrow-left"></i>
                 </span>
                 <span class="dashboardName">{{ dashboard.name }}</span>
-                <span class="button iconBtn dashboardIcon" id="dashboardFav">
-                    <i class="fas fa-star"></i>
-                </span>
             </div>
         </div>
 
@@ -105,18 +102,34 @@
         </div>
 
         <div class="dashConfContainer hidden">
-            <div>
-                <span>name</span>
-                <input id="dashboardName" type="text" value="{{ dashboard.name }}">
-            </div>
-            <div>
-                <span>Datasource url : </span>
-                {% if dashboard.url %}
-                    <input id="datasourceUrl"type="text"
-                            value="{{ dashboard.url }}">
-                {% else %}
-                    <input id="datasourceUrl"type="text">
-                {% endif %}
+            <div class="optionsWrapper">
+                <div class="optionWrapper">
+                    <div class="optionName">Dashboard name</div>
+                    <div>
+                        <input id="dashboardName" type="text" value="{{ dashboard.name }}">
+                    </div>
+                </div>
+                <div class="optionWrapper">
+                    <div class="optionName">Datasource url</div>
+                    <div>
+                    {% if dashboard.url %}
+                        <input id="datasourceUrl"type="text"
+                                value="{{ dashboard.url }}">
+                    {% else %}
+                        <input id="datasourceUrl"type="text" value="">
+                    {% endif %}
+                    </div>
+                </div>
+                <div class="deleteDashboard">
+                    <form method="post"
+                        action="{{ url_for('dashboards.deleteDashboard') }}">
+                        <input type="hidden" name="dashboardId" value="{{ dashboard.id }}">
+                        <button type="submit" id="deleteDashboardBtn"
+                                class="button textBtn">
+                                Delete dashboard
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -150,7 +163,33 @@
                 </div>
 
                 <div class="confContent hidden", id="confQueryContainer">
-                    <div class="queryWrapper">
+                    <div class="optionsWrapper">
+                        <div class="optionWrapper">
+                            <div class="optionName">Query</div>
+                            <div>
+                                <input type="text" id="promQuery">
+                            </div>
+                        </div>
+                        <div class="optionWrapper">
+                            <div class="optionName">Legend</div>
+                            <div>
+                                <input id="queryLegend" type="text">
+                            </div>
+                        </div>
+                        <div class="optionWrapper">
+                            <div class="optionName">Step</div>
+                            <div>
+                                <input id="queryStep" type="text">
+                            </div>
+                        </div>
+                        <div class="optionWrapper">
+                            <div class="optionName">Instant</div>
+                            <div>
+                                <input type="checkbox", id="queryType">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="queryWrapper">
                         <div class="query">
                             <span>query:</span>
                             <input type="text" id="promQuery">
@@ -169,7 +208,7 @@
                                 <input type="checkbox", id="queryType">
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="confContent hidden", id="confVisualizationContainer">

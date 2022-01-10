@@ -44,10 +44,6 @@ class Dashboard(db.Model):
     url = db.Column(db.String(30))
     timerange = db.Column(db.String(30))
 
-    def __init__(self, name):
-        self.name = name
-        self.timerange = "3h"
-
 
 class Row(db.Model):
     id = db.Column(db.String(30), primary_key=True)

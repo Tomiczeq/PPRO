@@ -200,7 +200,6 @@ function initChartConf() {
             visChart.classList.remove("button");
             visChart.classList.add("buttonSelected");
 
-
             var currentChart = window.dashboard.getCurrentChart();
             var chartType = visChart.id.replace("ChartBtn", "").trim();
             currentChart.visualization.type = chartType;

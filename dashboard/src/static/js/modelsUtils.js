@@ -1,3 +1,14 @@
+function showError(msg) {
+    document.getElementById("errorArea").textContent = msg;
+    $("#successArea").hide();
+    $("#errorArea").show();
+    $("#errorArea").delay(10000).fadeOut();
+}
+
+function hideError() {
+    $("#errorArea").hide();
+}
+
 function getRowHtml(row) {
     var rowElem = document.createElement('div');
     var rowHeader = document.createElement('div');
@@ -9,11 +20,9 @@ function getRowHtml(row) {
 
     // rowName.ondblclick = "this.contentEditable=true;this.className='inEdit';";
     rowName.addEventListener("dblclick", () => {
-        console.log("doubleclick");
         rowName.contentEditable = true;
     })
     rowName.addEventListener("blur", () => {
-        console.log("blur");
         rowName.contentEditable = false;
         row.name = rowName.textContent.trim();
     })
@@ -221,8 +230,7 @@ function getDefaultOptions(type) {
             }
             break;
         default:
-            // TODO
-            alert("Unknown chart type");
+            showError("Error");
     }
 
     return options;
@@ -259,7 +267,7 @@ function getTimerange(timerange) {
             start_date.setDate(start_date.getDate() - timerange_number);
             break
         default:
-            alert("Unknown timerange type: " + timerange_type);
+            console.log("Unknown timerange type: " + timerange_type);
     }
     var start_f = start_date.toISOString();
     var end_f = end_date.toISOString();
@@ -334,8 +342,6 @@ function getCommonParams() {
 function getChartParams(chart, promData) {
     var chartType = chart.visualization.type;
     var chartOptions = chart.visualization.options;
-    console.log("chart.visualization");
-    console.log(chart.visualization);
     var chartParams = getCommonParams();
 
     var chartLegend = chartOptions.legend.trim();
@@ -403,10 +409,9 @@ function getChartParams(chart, promData) {
             chartParams.chart.type = chartType;
             break;
         default:
-            // TODO
-            alert("get_chartParams Unknown chart type: " + chartType);
+            console.log("get_chartParams Unknown chart type: " + chartType);
     } 
-    fillData(chartType, chartOptions, chartParams, promData);
+    fillData(chart, chartType, chartOptions, chartParams, promData);
     return chartParams;
 }
 
@@ -421,17 +426,15 @@ function correct_units(units, values) {
             } 
             break;
         default:
-            alert("Unknown units: " + units
-                                    + ". Return default values");
+            showError("Wrong units");
     }
 
     return values;
 } 
 
-function fillData(chartType, chartOptions, chartParams, promData) {
+function fillData(chart, chartType, chartOptions, chartParams, promData) {
     if (promData.status != "success") {
-        // TODO
-        alert("prom query err");
+        chart.showError("promQuery error");
         return;
     }
 
@@ -439,8 +442,7 @@ function fillData(chartType, chartOptions, chartParams, promData) {
     switch(chartType) {
         case "line": case "column":
             if (data.resultType !== "matrix") {
-                // TODO
-                alert("bad data format");
+                chart.showError("bad data format");
             }
 
             var series = []
@@ -453,16 +455,14 @@ function fillData(chartType, chartOptions, chartParams, promData) {
                 if (chartParams.legend.show) {
                     var legend_name = chartOptions.legend.trim();
                     if (!legend_name) {
-                        // TODO
-                        alert("legend name should not be empty");
+                        chart.showError("Wrong legend");
                     }
 
                     if (legend_name in result.metric) {
                         var legend_value = result.metric[legend_name];
                         serie.name = legend_value;
                     } else {
-                        // TODO
-                        alert("legend_name not found in data");
+                        chart.showError("Wrong legend");
                     }
                 }
                 series.push(serie);
@@ -471,8 +471,7 @@ function fillData(chartType, chartOptions, chartParams, promData) {
             break;
         case "area":
             if (data.resultType !== "matrix") {
-                // TODO
-                alert("bad data format");
+                chart.showError("bad data format");
             }
 
             var series = []
@@ -484,16 +483,14 @@ function fillData(chartType, chartOptions, chartParams, promData) {
                 if (chartParams.legend.show) {
                     var legend_name = chartOptions.legend.trim();
                     if (!legend_name) {
-                        // TODO
-                        alert("legend name should not be empty");
+                        chart.showError("Wrong legend");
                     }
 
                     if (legend_name in result.metric) {
                         var legend_value = result.metric[legend_name];
                         serie.name = legend_value;
                     } else {
-                        // TODO
-                        alert("legend_name not found in data");
+                        chart.showError("Wrong legend");
                     }
                 }
                 series.push(serie);
@@ -502,8 +499,7 @@ function fillData(chartType, chartOptions, chartParams, promData) {
             break;
         case "pie": case "donut":
             if (data.resultType != "vector") {
-                // TODO
-                alert("bad data format");
+                chart.showError("bad data format");
             }
 
             var series = []
@@ -514,16 +510,14 @@ function fillData(chartType, chartOptions, chartParams, promData) {
                 if (chartParams.legend.show) {
                     var legend_name = chartOptions.legend.trim();
                     if (!legend_name) {
-                        // TODO
-                        alert("legend name should not be empty");
+                        chart.showError("Wrong legend");
                     }
 
                     if (legend_name in result.metric) {
                         var legend_value = result.metric[legend_name];
                         labels.push(legend_value);
                     } else {
-                        // TODO
-                        alert("legend_name not found in data");
+                        chart.showError("Wrong legend");
                     }
             }
 
@@ -534,8 +528,7 @@ function fillData(chartType, chartOptions, chartParams, promData) {
             break;
         case "heatmap":
             if (data.resultType !== "matrix") {
-                // TODO
-                alert("bad data format");
+                chart.showError("bad data format");
             }
 
             var series = []
@@ -547,17 +540,14 @@ function fillData(chartType, chartOptions, chartParams, promData) {
                 if (chartParams.legend.show) {
                     var legend_name = chartOptions.legend.trim();
                     if (!legend_name) {
-                        // TODO
-                        alert("legend name should not be empty");
+                        chart.showError("Wrong legend");
                     }
 
                     if (legend_name in result.metric) {
                         var legend_value = result.metric[legend_name];
-                        console.log("legend_value: " + legend_value);
                         serie.name = legend_value;
                     } else {
-                        // TODO
-                        alert("legend_name not found in data");
+                        chart.showError("Wrong legend");
                     }
                 }
                 series.push(serie);
@@ -565,7 +555,6 @@ function fillData(chartType, chartOptions, chartParams, promData) {
             chartParams.series = series;
             break;
         default:
-            // TODO
-            alert("fill_chart Unknown chart type: " + chartType);
+            console.log("fill_chart Unknown chart type: " + chartType);
     }
 }

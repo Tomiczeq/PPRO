@@ -37,6 +37,7 @@ nav {
 }
 
 input {
+    width: auto;
     margin: 0px 0px;
     background: transparent;
     color: var(--btn);
@@ -169,10 +170,17 @@ input {
     font-size: 10px;
 }
 
+.confChartWrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
 
 .confNav {
     display: flex;
     justify-content: center;
+    margin-top: 20px;
 }
 .confNav ul {
     display: flex;
@@ -208,6 +216,15 @@ input {
 
 .optionName {
     width: 130px;
+}
+
+#errorArea {
+    margin-right: 5px;
+    color: var(--error-fg);
+}
+#successArea {
+    margin-right: 5px;
+    color: var(--success-fg);
 }
 
 .hidden {

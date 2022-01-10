@@ -53,6 +53,12 @@ function init_dashboard() {
         window.dashboard.save();
     }); 
 
+    // actualize dashboard button
+    var refreshBtn = document.querySelector("#refreshDashboardBtn");
+    refreshBtn.addEventListener("click", () => {
+        window.dashboard.updateCharts();
+    }); 
+
     // dashboard settings button
     var dashConfBtn = document.getElementById("dashboardConf");
     dashConfBtn.addEventListener("click", () => {

@@ -60,7 +60,8 @@ def prometheusRequest():
     current_app.logger.info(f"response.text: {prom_response.text}")
 
     if prom_response.status_code != 200:
-        return make_response("Bad query", prom_response.status_code)
+        response["status"] = "prometheus error"
+        return make_response(response, 200)
 
     response["status"] = "ok"
     response["data"] = prom_response.json()
@@ -73,9 +74,11 @@ def saveDashboard():
     dashboardJson = json.loads(request.form.get('dashboard'))
     dashboardId = dashboardJson.get("id", "")
     rows_conf = dashboardJson.get("rows")
-    timerange = dashboardJson.get("timerange")
-    name = dashboardJson.get("name")
+    timerange = dashboardJson.get("timerange").strip()
+    name = dashboardJson.get("name").strip()
     url = dashboardJson.get("url", "")
+    if isinstance(url, str):
+        url = url.strip()
 
     dashboard = Dashboard.query.get(dashboardJson.get("id", ""))
     if not (dashboard and timerange and name):

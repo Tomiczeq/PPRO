@@ -32,14 +32,13 @@ class Dashboard {
                 this.updateCharts();
             },
             error: (e) => {
-                this.showError("getDashboardCharts error");
+                this.showError("Error");
             },
         });
     }
 
     save() {
         this.userFav = this.isFav();
-        console.log("this.userFav: " + this.userFav);
         this.actualizePositions();
         $.ajax({
             type: "POST",
@@ -160,14 +159,21 @@ class Dashboard {
         return this.rows[this.currentRowId].charts[this.currentChartId];
     }
 
-    // TODO
     showError(msg) {
-        alert(msg);
+        document.getElementById("errorArea").textContent = msg;
+        $("#errorArea").show();
+        $("#errorArea").delay(10000).fadeOut();
     }
 
-    // TODO
+    hideError() {
+        $("#errorArea").hide();
+    }
+
     showSaveSucces() {
-        alert("Saved");
+        document.getElementById("successArea").textContent = "saved";
+        $("#errorArea").hide();
+        $("#successArea").show();
+        $("#successArea").delay(5000).fadeOut();
     }
 }
 
@@ -301,7 +307,7 @@ class Chart {
 
     update() {
         if (!window.dashboard.url) {
-            alert("Empty url");
+            this.showError("Empty datasource url");
             return;
         }
 
@@ -320,8 +326,6 @@ class Chart {
 
         var timeRange = getTimerange();
         var promQuery = this.promQuery.replace(/\$timeRange/g, timeRange[2]);
-        console.log("PromQUery:");
-        console.log(promQuery);
         var requestConf = {
             "url": window.dashboard.url,
             "promQuery": promQuery,
@@ -337,15 +341,17 @@ class Chart {
             data: {
                 requestConf: JSON.stringify(requestConf)
             },
-            success: (response) => {
+            success: (response, textStatus, xhr) => {
+                console.log(textStatus);
+                console.log(xhr);
                 if (response.status === "ok") {
                     this.fill(response.data);
                 } else {
-                    this.showError("chart update error");
+                    this.showError(response.status);
                 }
             },
             error: (e) => {
-                this.showError("chart update error 2");
+                this.showError("Unexpected Error");
             },
         });
     }
@@ -365,8 +371,14 @@ class Chart {
         return this.qstring;
     }
 
-    // TODO
     showError(msg) {
-        alert(msg);
+        document.getElementById("errorArea").textContent = msg;
+        $("#successArea").hide();
+        $("#errorArea").show();
+        $("#errorArea").delay(5000).fadeOut();
+    }
+
+    hideError() {
+        $("#errorArea").hide();
     }
 }

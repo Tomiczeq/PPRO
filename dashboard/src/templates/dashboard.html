@@ -50,6 +50,8 @@
 
         <div class="middleArea">
             <div class="dashboardBar">
+                <div id="errorArea"></div>
+                <div id="successArea"></div>
                 <div class="timerange">
                     <span>last</span>
                     <span id="queryLast" contenteditable="true">{{ dashboard.timerange }}
@@ -135,8 +137,10 @@
 
         <div class="confContainer hidden">
 
-            <div class="confChartContainer">
-                <div class="confChart">
+            <div class="confChartWrapper">
+                <div class="confChartContainer">
+                    <div class="confChart">
+                    </div>
                 </div>
             </div>
 
@@ -250,18 +254,19 @@
     <script src="{{ url_for('static', filename='js/chartConf.js') }}"></script>
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
     <script>
+        $("#errorArea").fadeOut();
+        var dashboardId = "{{ dashboard.id }}";
+        var dashboardName = "{{ dashboard.name}} ";
+        var dashboard = new Dashboard(dashboardId, dashboardName);
+        var currentChartId = null;
         $(document).ready(function(){
             // Set cache = false for all jquery ajax requests.
             $.ajaxSetup({
                 cache: false,
             });
+            init_dashboard();
         });
 
-        var dashboardId = "{{ dashboard.id }}";
-        var dashboardName = "{{ dashboard.name}} ";
-        var dashboard = new Dashboard(dashboardId, dashboardName);
-        var currentChartId = null;
-        init_dashboard();
     </script>
 
 </body>

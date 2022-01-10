@@ -26,6 +26,8 @@ function showChartSettings(chart) {
 
     // fill some general options
     document.querySelector("#chartName").value = chart.name;
+    document.querySelector("#chartWidth").value = chart.style.width;
+    document.querySelector("#chartHeight").value = chart.style.height;
     document.querySelector("#promQuery").value = chart.promQuery;
     document.querySelector("#queryLegend").value = 
             chart.visualization.options.legend;
@@ -107,20 +109,6 @@ function initChartConf() {
     queryNav.classList.remove("button");
     queryNav.classList.add("buttonSelected");
 
-    // general section init
-    var queryInput = document.getElementById("promQuery");
-    queryInput.addEventListener("keyup", function(event) {
-        // Number 13 is the "Enter" key on the keyboard
-        if (event.keyCode === 13) {
-            // Cancel the default action, if needed
-            event.preventDefault();
-
-            var currentChart = window.dashboard.getCurrentChart();
-            currentChart.promQuery = queryInput.value.trim();
-            updateConfChart();
-        }
-    }); 
-
     var chartName = document.getElementById("chartName");
     chartName.addEventListener("keydown", function(event) {
         // Number 13 is the "Enter" key on the keyboard
@@ -136,6 +124,45 @@ function initChartConf() {
             document.querySelector(qstring).textContent = currentChart.name;
         }
     });
+
+    var chartWidth = document.getElementById("chartWidth");
+    chartWidth.addEventListener("keydown", function(event) {
+        // Number 13 is the "Enter" key on the keyboard
+        if (event.keyCode === 13) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+
+            var currentChart = window.dashboard.getCurrentChart();
+            currentChart.style.width = chartWidth.value.trim();
+            updateConfChart();
+        }
+    });
+
+    var chartHeight = document.getElementById("chartHeight");
+    chartHeight.addEventListener("keydown", function(event) {
+        // Number 13 is the "Enter" key on the keyboard
+        if (event.keyCode === 13) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+
+            var currentChart = window.dashboard.getCurrentChart();
+            currentChart.style.height = chartHeight.value.trim();
+            updateConfChart();
+        }
+    });
+
+    var queryInput = document.getElementById("promQuery");
+    queryInput.addEventListener("keyup", function(event) {
+        // Number 13 is the "Enter" key on the keyboard
+        if (event.keyCode === 13) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+
+            var currentChart = window.dashboard.getCurrentChart();
+            currentChart.promQuery = queryInput.value.trim();
+            updateConfChart();
+        }
+    }); 
 
     var queryStep = document.getElementById("queryStep");
     queryStep.addEventListener("keyup", function(event) {

@@ -6,7 +6,6 @@ function init() {
     var favDashBtns = document.querySelectorAll(".favDashBtn");
     favDashBtns.forEach((btn) => {
         btn.addEventListener("click", () => {
-            console.log("click");
             favDashBtns.forEach((btnn) => {
                 btnn.classList.toggle("hidden")
             })

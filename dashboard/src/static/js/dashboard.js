@@ -86,7 +86,6 @@ function init_dashboard() {
     dashboardNameInp.addEventListener("keydown", () => {
         // Number 13 is the "Enter" key on the keyboard
         if (event.keyCode === 13) {
-            console.log("enter");
             // Cancel the default action, if needed
             event.preventDefault();
             window.dashboard.name = dashboardNameInp.value.trim();

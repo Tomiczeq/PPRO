@@ -306,6 +306,27 @@ class Chart {
     }
 
     update() {
+
+        var chartNavQstring = "#" + this.id + " .chartNav";
+        var chartNav = document .querySelector(chartNavQstring);
+
+        var chartWrapperQstring = "#" + this.id + " .chartWrapper";
+        var chartWrapper = document.querySelector(chartWrapperQstring);
+
+        for (var styleKey in this.style) {
+            var styleValue = this.style[styleKey];
+            if (styleValue) {
+                chartWrapper.style[styleKey] = styleValue;
+            }
+        }
+        chartNav.style.width = this.style.width;
+        if (this.style.minWidth) {
+            chartNav.style.minWidth = this.style.minWidth;
+        }
+        if (this.style.maxWidth) {
+            chartNav.style.maxWidth = this.style.maxWidth;
+        }
+
         if (!window.dashboard.url) {
             this.showError("Empty datasource url");
             return;
@@ -341,9 +362,7 @@ class Chart {
             data: {
                 requestConf: JSON.stringify(requestConf)
             },
-            success: (response, textStatus, xhr) => {
-                console.log(textStatus);
-                console.log(xhr);
+            success: (response) => {
                 if (response.status === "ok") {
                     this.fill(response.data);
                 } else {

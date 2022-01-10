@@ -1,6 +1,8 @@
 #### RUN
 `docker-compose up`
 
+go to `http://localhost:8080`
+
 #### TESTS
 `cd dashboard`
 

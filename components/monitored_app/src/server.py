@@ -10,8 +10,6 @@ import numpy as np
 from flask import Flask
 from flask import request
 from flask import Response
-from flask import g
-
 
 from prometheus_metrics import Metrics
 
@@ -25,40 +23,30 @@ CONTENT_TYPE_LATEST = "text/plain; version=0.0.4; charset=utf-8"
 EXCEPTION_LIST = ["KeyError", "AttributeError", "RuntimeError", "TypeError"]
 
 
-@app.before_request
-def before_request():
-    g.start_time = time.time()
+@app.route("/errors_total", methods=["GET"])
+def errors_total():
+    num_errors = int(request.args.get('num_errors', 1))
 
-
-@app.after_request
-def after_request(response):
-    duration = time.time() - g.start_time
-    app.logger.info(f"Request on endpoint {request.path} "
-                    f"took {duration} sec.")
-    metrics.request_duration_seconds(
-            method=request.method,
-            endpoint=request.path,
-            status=response.status_code,
-            duration=duration
-    )
-    return response
-
-
-def get_sleep_time():
-    return np.random.exponential(scale)
-
-
-@app.route("/", defaults={"path": ""}, methods=["GET"])
-@app.route("/<path:path>", methods=["GET", "POST"])
-def simulation(path):
-
-    # simulate some processing time
-    time.sleep(get_sleep_time())
-
-    # simulate some errors
-    if random.random() < error_chance:
+    for i in range(num_errors):
         exception = random.choice(EXCEPTION_LIST)
         metrics.errors_total(err_type=exception)
+
+    return Response(status=200)
+
+
+@app.route("/request_duration_seconds", methods=["GET"])
+def request_duration_seconds():
+    scale = float(request.args.get('scale', 0.5))
+    size = int(request.args.get('size', 1))
+
+    durations = np.random.exponential(scale, size)
+    for duration in durations:
+        metrics.request_duration_seconds(
+                method=request.method,
+                endpoint=request.path,
+                status=200,
+                duration=duration
+        )
 
     return Response(status=200)
 

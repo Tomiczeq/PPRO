@@ -18,16 +18,20 @@ def login(client, username, password, follow_redirects=True):
 def test_prometheus_request(flask_app):
     username = "ennie"
     password = "ennie"
+
+    # add user to database
     with flask_app.app_context():
         user = User(username, password)
         db.session.add(user)
         db.session.commit()
 
     with flask_app.test_client() as test_client:
+        # login should be required
         response = test_client.get('/api/prometheusRequest',
                                    follow_redirects=True)
         assert b"Please log in to access this page." in response.data
 
+        # login
         response = login(test_client, username, password)
 
         # test valid request
@@ -46,7 +50,7 @@ def test_prometheus_request(flask_app):
         assert response['status'] == 'ok'
         assert response['data']["status"] == 'success'
 
-        # wrong url
+        # request with wrong url
         request_conf = {
             'url': 'http://localhost:4090',
             'promQuery': 'errors_total',
@@ -67,6 +71,7 @@ def test_save_dashboard(flask_app):
     password = "ennie"
     dashboardId = 1
 
+    # prepare database
     with flask_app.app_context():
         user = User(username, password)
         dashboard = Dashboard(name="Dashboard", url="", timerange="1h")
@@ -75,6 +80,7 @@ def test_save_dashboard(flask_app):
         db.session.add(dashboard)
         db.session.commit()
 
+    # try to save dashboard with this config
     dashboard_conf = {
         "id": 1,
         "name": "SuperDashboard",
@@ -124,17 +130,22 @@ def test_save_dashboard(flask_app):
     }
     conf_json = json.dumps(dashboard_conf)
     with flask_app.test_client() as test_client:
+        # login should be required
         response = test_client.post('/api/saveDashboard',
                                     data={"dashboard": conf_json},
                                     follow_redirects=True)
         assert b"Please log in to access this page." in response.data
 
+        # login
         response = login(test_client, username, password)
+
+        # save dashboard
         response = test_client.post('/api/saveDashboard',
                                     data={"dashboard": conf_json},
                                     follow_redirects=True)
         assert response.status_code == 200
 
+    # tests whether the changes have been reflected in the database
     with flask_app.app_context():
         dashboard = Dashboard.query.get(dashboardId)
         assert dashboard.name == dashboard_conf["name"]
@@ -170,6 +181,8 @@ def test_get_dashboard_charts(flask_app):
     chartId2 = "2"
     chartName2 = "SuperChart2"
 
+    # Prepare database
+    # add user and dashboard with some charts
     with flask_app.app_context():
         user = User(username, password)
         dashboard = Dashboard(name=dashboardName, url="", timerange="3h")
@@ -186,16 +199,23 @@ def test_get_dashboard_charts(flask_app):
         db.session.add(chart2)
         db.session.commit()
 
+    # test whether we get created dashboard and charts
     with flask_app.test_client() as test_client:
+        # login should be required
         response = test_client.get('/api/getDashboardCharts',
                                    follow_redirects=True)
         assert b"Please log in to access this page." in response.data
 
+        # login
         response = login(test_client, username, password)
+
+        # test request without provided dashboard id
+        # should return not found
         response = test_client.get('/api/getDashboardCharts',
                                    follow_redirects=True)
         assert response.status_code == 404
 
+        # test correct request
         data = {"dashboardId": dashboardId}
         response = test_client.get('/api/getDashboardCharts',
                                    follow_redirects=True,

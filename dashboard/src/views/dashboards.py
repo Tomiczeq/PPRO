@@ -37,7 +37,6 @@ def dashboardPage(name):
 @dashboards.route("/createNewDashboard", methods=["POST"])
 @login_required
 def createDashboard():
-
     name = "New Dashboard"
     i = 0
     dashboardName = ""

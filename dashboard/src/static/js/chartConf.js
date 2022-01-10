@@ -25,6 +25,7 @@ function showChartSettings(chart) {
         ".confHeader .dashboardName").textContent = chart.name;
 
     // fill some general options
+    document.querySelector("#chartName").value = chart.name;
     document.querySelector("#promQuery").value = chart.promQuery;
     document.querySelector("#queryLegend").value = 
             chart.visualization.options.legend;
@@ -119,6 +120,22 @@ function initChartConf() {
             updateConfChart();
         }
     }); 
+
+    var chartName = document.getElementById("chartName");
+    chartName.addEventListener("keydown", function(event) {
+        // Number 13 is the "Enter" key on the keyboard
+        if (event.keyCode === 13) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+
+            var currentChart = window.dashboard.getCurrentChart();
+            currentChart.name = chartName.value.trim();
+            document.querySelector(
+                ".confHeader .dashboardName").textContent = currentChart.name;
+            var qstring = "#" + currentChart.id + " .chartName";
+            document.querySelector(qstring).textContent = currentChart.name;
+        }
+    });
 
     var queryStep = document.getElementById("queryStep");
     queryStep.addEventListener("keyup", function(event) {

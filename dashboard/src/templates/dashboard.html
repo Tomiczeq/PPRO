@@ -160,6 +160,14 @@
             <!-- Obsah jednotlivych nastaveni -->
             <div class="confWrapper">
                 <div class="confContent hidden", id="confGeneralContainer">
+                    <div class="optionsWrapper">
+                        <div class="optionWrapper">
+                            <div class="optionName">Name</div>
+                            <div>
+                                <input type="text" id="chartName">
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="confContent hidden", id="confQueryContainer">
@@ -189,26 +197,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- <div class="queryWrapper">
-                        <div class="query">
-                            <span>query:</span>
-                            <input type="text" id="promQuery">
-                        </div>
-                        <div class="queryOptions">
-                            <div>
-                                <span>legend</span>
-                                <input id="queryLegend" type="text">
-                            </div>
-                            <div>
-                                <span>step</span>
-                                <input id="queryStep" type="text">
-                            </div>
-                            <div>
-                                <span>instant</span>
-                                <input type="checkbox", id="queryType">
-                            </div>
-                        </div>
-                    </div> -->
                 </div>
 
                 <div class="confContent hidden", id="confVisualizationContainer">
@@ -241,9 +229,13 @@
                 </div>
 
                 <div class="confContent hidden", id="confAxesContainer">
-                    <div>
-                        <span>xaxis units: </span>
-                        <input id="xaxisUnits" type="text">
+                    <div class="optionsWrapper">
+                        <div class="optionWrapper">
+                            <div class="optionName">Xaxis units</div>
+                            <div>
+                                <input id="xaxisUnits" type="text">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -8,6 +8,16 @@ services:
     volumes:
       - ./dashboard/conf:/www/ppro/dashboard/conf
       - ./dashboard/src:/www/ppro/dashboard/src
+      - ./dashboard/scripts:/www/ppro/dashboard/scripts
+    entrypoint: /www/ppro/dashboard/scripts/entrypoint.sh
+    command: python3 /www/ppro/dashboard/src/server.py --conf=/www/ppro/dashboard/conf/server.conf
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      - MYSQL_DATABASE=test
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    network_mode: "host"
 
   prometheus:
     image: prom/prometheus

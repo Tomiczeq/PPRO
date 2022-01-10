@@ -61,8 +61,6 @@ def test_prometheus_request(flask_app):
                                    query_string=data).json
         assert response['status'] == "connection error"
 
-        # TODO invalid request
-
 
 def test_save_dashboard(flask_app):
     username = "ennie"

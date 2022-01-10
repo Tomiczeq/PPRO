@@ -3,7 +3,6 @@ from prometheus_client import Gauge
 from prometheus_client import Histogram
 
 
-# TODO mozna pouzit zabudovane decoratory
 class Metrics:
 
     def __init__(self, app_name):

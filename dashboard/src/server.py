@@ -9,7 +9,6 @@ from views.dashboards import dashboards
 from views.auth import auth
 from views.models import db
 from views.models import User
-from views.models import Dashboard  # TODO docasne
 
 
 def create_app(config):

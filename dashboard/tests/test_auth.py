@@ -25,12 +25,6 @@ def logout(client):
 
 
 def test_login_get(flask_app):
-    """
-    GIVEN a Flask application configured for testing
-    WHEN the '/login' page is requested (GET)
-    THEN check that the response is valid
-    """
-
     test_data = b'<form class="loginForm" method="POST" action="/login">'
 
     with flask_app.test_client() as test_client:
@@ -40,12 +34,6 @@ def test_login_get(flask_app):
 
 
 def test_login_post(flask_app):
-    """
-    GIVEN a Flask application configured for testing
-    WHEN the '/login' page is requested (POST)
-    THEN check that the responses are valid
-    """
-
     username = "ennie"
     password = "ennie"
 
@@ -65,11 +53,6 @@ def test_login_post(flask_app):
 
 
 def test_singup_get(flask_app):
-    """
-    GIVEN a Flask application configured for testing
-    WHEN the '/signUp' page is requested (GET)
-    THEN check that the response is valid
-    """
     test_data = b'<form class="loginForm" method="POST" action="/signUp">'
 
     with flask_app.test_client() as test_client:
@@ -80,11 +63,6 @@ def test_singup_get(flask_app):
 
 
 def test_singup_post(flask_app):
-    """
-    GIVEN a Flask application configured for testing
-    WHEN the '/signUp' page is requested (GET)
-    THEN check that the response is valid
-    """
     username = "ennie"
     password = "ennie"
 

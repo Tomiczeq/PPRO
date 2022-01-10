@@ -97,7 +97,8 @@ function init_dashboard() {
         if (event.keyCode === 13) {
             // Cancel the default action, if needed
             event.preventDefault();
-            window.dashboard.url = datasourceInp.value.trim();
+            var datasourceUrl = datasourceInp.value.trim();
+            window.dashboard.url = datasourceUrl;
             window.dashboard.updateCharts();
             datasourceInp.blur();
         }

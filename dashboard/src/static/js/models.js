@@ -49,6 +49,7 @@ class Dashboard {
             },
             success: (response) => {
                 this.showSaveSucces();
+                window.history.replaceState("", "", '/dashboards/' + this.name);
             },
             error: (e) => {
                 this.showError("Save error");

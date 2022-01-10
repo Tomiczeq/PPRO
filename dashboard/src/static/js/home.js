@@ -24,30 +24,24 @@ function init() {
     });
 
     // search 
-    var searchDashboardBtn = document.getElementById("searchDashboardBtn");
-    var stopSearchBtn = document.getElementById("stopSearchBtn");
-    var searchText = document.getElementById("searchText");
     var liItems = document.querySelectorAll("li");
+    var searchText = document.getElementById("searchText");
+    searchText.addEventListener("keydown", function(event) {
+        // Number 13 is the "Enter" key on the keyboard
+        if (event.keyCode === 13) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            var text = searchText.value.trim();
 
-    searchDashboardBtn.addEventListener("click", () => {
-        var text = searchText.value.trim();
-
-        liItems.forEach((liItem) => {
-            liItem.classList.remove("hidden");
-            var liItemA = liItem.querySelector("a");
-            if (!liItemA.textContent.includes(text)) {
-                liItem.classList.add("hidden");
-            }
-        })
-    })
-
-    stopSearchBtn.addEventListener("click", () => {
-        liItems.forEach((liItem) => {
-            liItem.classList.remove("hidden");
-        })
-
-        searchText.value = "";
-    })
+            liItems.forEach((liItem) => {
+                liItem.classList.remove("hidden");
+                var liItemA = liItem.querySelector("a");
+                if (!liItemA.textContent.includes(text)) {
+                    liItem.classList.add("hidden");
+                }
+            })
+        }
+    });
 }
 
 init();

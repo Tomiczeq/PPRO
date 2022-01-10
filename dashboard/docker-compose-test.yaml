@@ -14,7 +14,7 @@ services:
     working_dir: /www/ppro/dashboard/tests
     entrypoint: ../scripts/entrypoint.sh
     #command: bash -c "while true; do sleep 1; done"
-    command: pytest -s
+    command: pytest -v
 
   mysql:
     image: mysql:5.7

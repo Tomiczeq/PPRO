@@ -54,6 +54,7 @@ def createDashboard():
 
 
 @dashboards.route('/deleteDashboard', methods=["Post"])
+@login_required
 def deleteDashboard():
     dashboardId = request.form.get('dashboardId')
 

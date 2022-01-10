@@ -64,11 +64,100 @@ def test_prometheus_request(flask_app):
         # TODO invalid request
 
 
-
-
-
 def test_save_dashboard(flask_app):
-    pass
+    username = "ennie"
+    password = "ennie"
+    dashboardId = 1
+
+    with flask_app.app_context():
+        user = User(username, password)
+        dashboard = Dashboard(name="Dashboard", url="", timerange="1h")
+        dashboard.id = dashboardId
+        db.session.add(user)
+        db.session.add(dashboard)
+        db.session.commit()
+
+    dashboard_conf = {
+        "id": 1,
+        "name": "SuperDashboard",
+        "timerange": "3h",
+        "rows": {
+            "row_0qibkuoib3": {
+                "id": "row_0qibkuoib3",
+                "name": "Row",
+                "dashboardId": "1",
+                "position": 0,
+                "charts": {
+                    "chart_u4ojijphna": {
+                        "id": "chart_u4ojijphna",
+                        "name": "Chart",
+                        "rowId": "row_0qibkuoib3",
+                        "position": 0,
+                        "promQuery": "test",
+                        "instant": False,
+                        "step": "1m",
+                        "style": {
+                            "width": "20vw",
+                            "minWidth": "150px",
+                            "maxWidth": None,
+                            "height": "200px",
+                            "minHeight": None,
+                            "maxHeight": None
+                        },
+                        "visualization": {
+                            "type": "line",
+                            "options": {
+                                "curve": "straight",
+                                "lineWidth": 5,
+                                "type": "line",
+                                "stacked": False,
+                                "legend": "",
+                                "units": "numeric"
+                            }
+                        },
+                    }
+                },
+                "chartsByPos": [],
+                "hidden": False
+            }
+        },
+        "url": "test",
+        "userFav": False
+    }
+    conf_json = json.dumps(dashboard_conf)
+    with flask_app.test_client() as test_client:
+        response = test_client.post('/api/saveDashboard',
+                                    data={"dashboard": conf_json},
+                                    follow_redirects=True)
+        assert b"Please log in to access this page." in response.data
+
+        response = login(test_client, username, password)
+        response = test_client.post('/api/saveDashboard',
+                                    data={"dashboard": conf_json},
+                                    follow_redirects=True)
+        assert response.status_code == 200
+
+    with flask_app.app_context():
+        dashboard = Dashboard.query.get(dashboardId)
+        assert dashboard.name == dashboard_conf["name"]
+        assert dashboard.url == dashboard_conf["url"]
+        assert dashboard.timerange == dashboard_conf["timerange"]
+
+        row_conf = dashboard_conf["rows"]["row_0qibkuoib3"]
+        row = Row.query.filter_by(dashboardId=dashboardId).first()
+        assert row.id == row_conf["id"]
+        assert row.name == row_conf["name"]
+        assert row.position == row_conf["position"]
+
+        chart_conf = row_conf["charts"]["chart_u4ojijphna"]
+        chart = Chart.query.filter_by(rowId=row_conf["id"]).first()
+        assert chart.id == chart_conf["id"]
+        assert chart.name == chart_conf["name"]
+        assert chart.position == chart_conf["position"]
+        assert chart.promQuery == chart_conf["promQuery"]
+        assert chart.instant == chart_conf["instant"]
+        assert chart.step == chart_conf["step"]
+        assert chart.visualization == json.dumps(chart_conf["visualization"])
 
 
 def test_get_dashboard_charts(flask_app):
@@ -85,7 +174,7 @@ def test_get_dashboard_charts(flask_app):
 
     with flask_app.app_context():
         user = User(username, password)
-        dashboard = Dashboard(dashboardName)
+        dashboard = Dashboard(name=dashboardName, url="", timerange="3h")
         dashboard.id = dashboardId
         row = Row(id=rowId, name=rowName, dashboardId=dashboardId)
         chart1 = Chart(id=chartId1, name=chartName1, rowId=rowId,
@@ -100,7 +189,6 @@ def test_get_dashboard_charts(flask_app):
         db.session.commit()
 
     with flask_app.test_client() as test_client:
-
         response = test_client.get('/api/getDashboardCharts',
                                    follow_redirects=True)
         assert b"Please log in to access this page." in response.data

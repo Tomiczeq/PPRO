@@ -27,9 +27,9 @@ def test_dashboard_page(flask_app):
 
     with flask_app.app_context():
         user = User(username, password)
-        dashboard = Dashboard(dashboard_name)
-        dashboard.url = datasource_url
-        dashboard.timerange = timerange
+        dashboard = Dashboard(name=dashboard_name,
+                              url=datasource_url,
+                              timerange=timerange)
         db.session.add(user)
         db.session.add(dashboard)
         db.session.commit()
@@ -74,7 +74,9 @@ def test_homepage(flask_app):
 
     with flask_app.app_context():
         user = User(username, password)
-        dashboard = Dashboard("SuperDashboard")
+        dashboard = Dashboard(name="SuperDashboard",
+                              url="",
+                              timerange="3h")
         db.session.add(user)
         db.session.add(dashboard)
         db.session.commit()
@@ -112,3 +114,42 @@ def test_create_dashboard(flask_app):
 
         newDashbrd = Dashboard.query.filter_by(name="New Dashboard 0").first()
         assert newDashbrd
+
+
+def test_delete_dashboard(flask_app):
+    username = "ennie"
+    password = "ennie"
+
+    dashboardId = None
+
+    with flask_app.app_context():
+        user = User(username, password)
+        dashboard = Dashboard(name="SuperDashboard",
+                              url="",
+                              timerange="3h")
+        deletedDashboard = Dashboard(name="DeletedDashboard",
+                                     url="",
+                                     timerange="3h")
+        db.session.add(user)
+        db.session.add(dashboard)
+        db.session.add(deletedDashboard)
+        db.session.commit()
+        dashboardId = (Dashboard.query
+                                .filter_by(name="DeletedDashboard")
+                                .first().id)
+
+    with flask_app.test_client() as test_client:
+        response = test_client.post('/deleteDashboard',
+                                    data={"dashboardId": dashboardId},
+                                    follow_redirects=True)
+        assert b"Please log in to access this page." in response.data
+
+        response = login(test_client, username, password)
+        assert b"ennie" in response.data
+
+        response = test_client.post('/deleteDashboard',
+                                    data={"dashboardId": dashboardId},
+                                    follow_redirects=True)
+        assert b"ennie" in response.data
+        assert b"SuperDashboard" in response.data
+        assert b"DeletedDashboard" not in response.data

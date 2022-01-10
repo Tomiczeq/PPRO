@@ -10,7 +10,7 @@ class Metrics:
         self.HISTOGRAM = Histogram(
                 'request_duration_seconds', 'track requests duration',
                 ['app', 'method', 'endpoint', 'status'],
-                buckets=[0.01, 0.05, 0.1, 0.5]
+                buckets=[0.01, 0.05, 0.1, 0.5, 1]
         )
         self.COUNTER = Counter(
                 'errors_total', 'count number of errors',

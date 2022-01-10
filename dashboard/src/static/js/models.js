@@ -300,6 +300,11 @@ class Chart {
     }
 
     update() {
+        if (!window.dashboard.url) {
+            alert("Empty url");
+            return;
+        }
+
         // need to delete rendered apexchart, because apexChart updateOptions
         // merge old options with new options. This cause problems, because
         // old options are not removed.
@@ -314,9 +319,12 @@ class Chart {
         }
 
         var timeRange = getTimerange();
+        var promQuery = this.promQuery.replace(/\$timeRange/g, timeRange[2]);
+        console.log("PromQUery:");
+        console.log(promQuery);
         var requestConf = {
             "url": window.dashboard.url,
-            "promQuery": this.promQuery,
+            "promQuery": promQuery,
             "instant": this.instant,
             "step": this.step,
             "start": timeRange[0],

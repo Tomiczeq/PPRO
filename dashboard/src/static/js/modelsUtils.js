@@ -264,7 +264,7 @@ function getTimerange(timerange) {
     var start_f = start_date.toISOString();
     var end_f = end_date.toISOString();
 
-    return [start_f, end_f];
+    return [start_f, end_f, last];
 }
 
 function createId(prefix){
@@ -296,6 +296,7 @@ function getDefaultName(identifier, substring) {
 function getCommonParams() {
     chartParams = {
         chart: {
+            foreColor: '#4b97d4',
             animations: { enabled: false},
             redrawOnParentResize: true,
             width: '100%',
@@ -355,7 +356,7 @@ function getChartParams(chart, promData) {
                 show: showLegend,
             };
             var xaxis = {
-                type: chartOptions.units
+                type: chartOptions.units,
             };
 
             chartParams.stroke = stroke;
